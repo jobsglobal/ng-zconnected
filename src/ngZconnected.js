@@ -1,6 +1,11 @@
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
-    .factory('ngZconnected', [function() {
-        return Zconnected;
+    .provider('ngZconnected', [function() {
+        this.setApiUrl = function(apiUrl) {
+            this.apiUrl = apiUrl;
+        };
+        this.$get = [function() {
+            return ngZconnected;
+        }];
     }])
     .directive('nonZero', function() {
         return {
