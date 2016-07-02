@@ -947,14 +947,6 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.form.validatio
     .factory('ngZconnected', [function() {
         return Zconnected;
     }])
-    .run(['$templateCache', '$http', function($templateCache, $http) {
-        $http.get('src/templates/ngPagination.html')
-            .then(function(resp) {
-                $templateCache.put('/ztemplate/ngPagination.html', resp.data);
-            }, function(error) {
-                console.log(error);
-            });
-    }]);
 angular.module('ngZconnected.form.validations', []).directive('nonZero', function() {
     return {
         restrict: 'A',
@@ -1010,7 +1002,7 @@ angular.module('ngZconnected.directives', [])
     .directive('zloader', function() {
         return {
             restrict: 'E',
-            templateUrl: '/media/com_zconjobs/js/app/template/loader.html'
+            templateUrl: '/src/templates/ngLoader.html'
         }
     })
     .directive('dateConverter', function() {

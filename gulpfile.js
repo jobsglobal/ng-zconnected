@@ -59,3 +59,5 @@ gulp.task('serve', ['compile', 'templates', 'sample', 'watch'], function() {
         port: 9002
     });
 });
+
+gulp.task('default', ['clean', 'compile', 'templates']);
