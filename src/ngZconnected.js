@@ -57,7 +57,7 @@ angular.module('ngZconnected.directives', [])
     .directive('zloader', function() {
         return {
             restrict: 'E',
-            templateUrl: '/media/com_zconjobs/js/app/templates/ngLoader.html'
+            templateUrl: '/templates/ngLoader.html'
         }
     })
     .directive('dateConverter', function() {

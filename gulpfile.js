@@ -13,6 +13,7 @@ var jsDeps = './lib';
 var inject = require('gulp-inject');
 var del = require('del');
 var angularTemplatecache = require('gulp-angular-templatecache');
+var addStream = require('add-stream');
 gulp.task('sample', function() {
     var files = gulp.src(['src/**/*.js', 'src/**/*.css', 'src/**/*.less', 'dist/**/*.min.js', 'dist/**/*.tpl.js'])
         .pipe(_if('*.js', angularFilesort()));
@@ -28,17 +29,15 @@ gulp.task('sample', function() {
         .pipe(connect.reload());
 });
 var templateOptions = {
-    root: './src',
+    root: '/templates',
     module: 'ngZconnected'
 };
-
-gulp.task('templates', function() {
-    return gulp.src('src/**/*.html')
-        .pipe(angularTemplatecache('templates.tpl.js', templateOptions))
-        .pipe(gulp.dest('dist'));
-});
 gulp.task('compile', function() {
+    var templates = gulp.src('src/templates/**/*.html')
+        .pipe(angularTemplatecache('templates.tpl.js', templateOptions));
     return gulp.src(jsFiles)
+        .pipe(concat('zconnected.js'))
+        .pipe(addStream.obj(templates))
         .pipe(concat('zconnected.js'))
         .pipe(gulp.dest(jsDest))
         .pipe(rename('zconnected.min.js'))
@@ -52,7 +51,7 @@ gulp.task('clean', function(cb) {
 gulp.task('watch', function() {
     gulp.watch(['src/**'], ['sample']);
 });
-gulp.task('serve', ['compile', 'templates', 'sample', 'watch'], function() {
+gulp.task('serve', ['compile', 'sample', 'watch'], function() {
     connect.server({
         root: ['.tmp/dist', '.'],
         livereload: true,
@@ -60,4 +59,4 @@ gulp.task('serve', ['compile', 'templates', 'sample', 'watch'], function() {
     });
 });
 
-gulp.task('default', ['clean', 'compile', 'templates']);
+gulp.task('default', ['clean', 'compile']);
