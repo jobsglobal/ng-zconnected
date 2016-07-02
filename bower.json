@@ -1,30 +1,30 @@
 {
-    "name": "ngzconnected",
-    "description": "Front-end Angular library for Zconnected",
-    "main": "",
-    "authors": [
-        "Josh Jim <joshjim27@gmail.com>"
-    ],
-    "license": "MIT",
-    "keywords": [
-        "ngZconnected",
-        "Zconnected",
-        "Jobsglobal"
-    ],
-    "homepage": "",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "angular": "^1.5.7",
-        "angular-resource": "^1.5.7",
-        "angular-cookies": "^1.5.7",
-        "jquery": "^3.0.0",
-        "ng-file-upload": "^12.0.4"
-    },
-    "version": "1.0.2"
+  "name": "ngzconnected",
+  "description": "Front-end Angular library for Zconnected",
+  "main": "",
+  "authors": [
+    "Josh Jim <joshjim27@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "ngZconnected",
+    "Zconnected",
+    "Jobsglobal"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.5.7",
+    "angular-resource": "^1.5.7",
+    "angular-cookies": "^1.5.7",
+    "jquery": "^3.0.0",
+    "ng-file-upload": "^12.0.4"
+  },
+  "version": "1.0.3"
 }
