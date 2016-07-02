@@ -15,7 +15,7 @@ var del = require('del');
 var angularTemplatecache = require('gulp-angular-templatecache');
 var addStream = require('add-stream');
 gulp.task('sample', function() {
-    var files = gulp.src(['src/**/*.js', 'src/**/*.css', 'src/**/*.less', 'dist/**/*.min.js', 'dist/**/*.tpl.js'])
+    var files = gulp.src(['src/**/*.js', 'src/**/*.css', 'src/**/*.less', 'dist/**/zconnected.js'])
         .pipe(_if('*.js', angularFilesort()));
     gulp.src('sample/index.html')
         .pipe(wiredep({
@@ -30,10 +30,11 @@ gulp.task('sample', function() {
 });
 var templateOptions = {
     root: '/templates',
-    module: 'ngZconnected'
+    module: 'ngZconnected.templates',
+    standalone: true
 };
 gulp.task('compile', function() {
-    var templates = gulp.src('src/templates/**/*.html')
+    var templates = gulp.src('src/templates/*.html')
         .pipe(angularTemplatecache('templates.tpl.js', templateOptions));
     return gulp.src(jsFiles)
         .pipe(concat('zconnected.js'))

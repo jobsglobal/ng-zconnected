@@ -1,30 +1,29 @@
-angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.form.validations', 'ngZconnected.directives'])
+angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
     .factory('ngZconnected', [function() {
         return Zconnected;
     }])
-angular.module('ngZconnected.form.validations', []).directive('nonZero', function() {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        scope: {
-            nonZero: '='
-        },
-        link: function(scope, element, attribs, ctrl) {
-            function validateNonZero(value) {
-                var valid = value > 0;
-                ctrl.$setValidity('nonZero', valid);
-                return valid ? value : undefined;
-            }
+    .directive('nonZero', function() {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            scope: {
+                nonZero: '='
+            },
+            link: function(scope, element, attribs, ctrl) {
+                function validateNonZero(value) {
+                    var valid = value > 0;
+                    ctrl.$setValidity('nonZero', valid);
+                    return valid ? value : undefined;
+                }
 
-            if (scope.nonZero) {
-                ctrl.$parsers.unshift(validateNonZero);
-                validateNonZero(ctrl.$modelValue);
-            }
+                if (scope.nonZero) {
+                    ctrl.$parsers.unshift(validateNonZero);
+                    validateNonZero(ctrl.$modelValue);
+                }
 
-        }
-    };
-});
-angular.module('ngZconnected.directives', [])
+            }
+        };
+    })
     .directive('selectOnClick', function() {
         return {
             restrict: 'A',
