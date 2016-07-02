@@ -1,4 +1,4 @@
-var Zconnected = (function ($) {
+var Zconnected = (function($) {
     var _DEBUG = true;
     //The following configuration is only for sublime debugging.
     var debuggerSettings = {
@@ -10,6 +10,7 @@ var Zconnected = (function ($) {
         XDEBUG_SESSION_KEY: "KEY"
 
     };
+
     var _baseUrl = $('base').attr('href') + 'index.php';
     //Global variables
     //Utility module
@@ -44,12 +45,12 @@ var Zconnected = (function ($) {
 
         }
         var $customFooter = $('.custom-footer');
-        if($customFooter.length){
+        if ($customFooter.length) {
             var $domainName = $customFooter.find('.domain-name');
-            if($domainName.length){
-                if(Zconnected.websiteName == 'jobsglobal'){
+            if ($domainName.length) {
+                if (Zconnected.websiteName == 'jobsglobal') {
                     $domainName.text(Zconnected.helpers.ucfirst('Zconnected.com'));
-                }else{
+                } else {
                     $domainName.text(Zconnected.helpers.ucfirst('Jobsglobal.com'));
 
                 }
@@ -66,7 +67,7 @@ var Zconnected = (function ($) {
         var $logoutMenu = $('#menu677');
         if ($logoutMenu.length) {
 
-            $logoutMenu.on('click', function (e) {
+            $logoutMenu.on('click', function(e) {
                 e.preventDefault();
                 window.location.href = $('#logoutLink').attr('href');
             });
@@ -75,7 +76,7 @@ var Zconnected = (function ($) {
         var $menuProfile = $('.zconjobs-menu-profile');
         if ($menuProfile.length) {
             $menuProfile.hide();
-            $('body').on('click', 'a', function (event) {
+            $('body').on('click', 'a', function(event) {
                 var $a = $(this);
                 var url = $a.attr('href');
                 if (url && url.charAt(0) != '#') {
@@ -88,7 +89,7 @@ var Zconnected = (function ($) {
 
         var $systemMessage = $('#system-message');
         if ($systemMessage.length) {
-            $('#system-message').on("DOMNodeInserted", function () {
+            $('#system-message').on("DOMNodeInserted", function() {
                 hideSystemMessage();
             });
             if ($('#system-message').html().length > 0) {
@@ -123,8 +124,8 @@ var Zconnected = (function ($) {
 
     function hideSystemMessage() {
         var $this = $('#system-message');
-        window.setTimeout(function () {
-            $this.slideUp(1000, function () {
+        window.setTimeout(function() {
+            $this.slideUp(1000, function() {
                 $this.html('');
                 $this.show();
             });
@@ -222,12 +223,12 @@ var Zconnected = (function ($) {
     function hideLoader(selector) {
         if (selector) {
             var $loader = $(selector).siblings('.spinner-wrapper');
-            $loader.fadeOut('400', function () {
+            $loader.fadeOut('400', function() {
                 $(this).remove();
             });
         } else {
             var $loaders = $('.spinner-wrapper');
-            $loaders.fadeOut('400', function () {
+            $loaders.fadeOut('400', function() {
                 $(this).remove();
             });
         }
@@ -235,12 +236,12 @@ var Zconnected = (function ($) {
 
     function animateTextChange(elementSelector, text) {
         var $elementSelector = $(elementSelector);
-        $elementSelector.animate({opacity: '0'}, "fast");
-        $elementSelector.queue(function () {
+        $elementSelector.animate({ opacity: '0' }, "fast");
+        $elementSelector.queue(function() {
             $elementSelector.html(text);
             $elementSelector.dequeue(); // This is necessary to continue the animation
         });
-        $elementSelector.animate({opacity: '1'}, "fast");
+        $elementSelector.animate({ opacity: '1' }, "fast");
     }
 
     /**
@@ -286,8 +287,7 @@ var Zconnected = (function ($) {
             }
             //set the data-error-for attribute of element to the elementSelector for future reference
             $error.attr('data-error-for', elementSelector);
-        }
-        ;
+        };
         if (animate) {
             Zconnected.helpers.animateTextChange($(".zconnected-error[data-error-for='" + elementSelector + "']"), message);
         } else {
@@ -317,7 +317,7 @@ var Zconnected = (function ($) {
         //check if animated
         if (animate) {
             //hide the element
-            $error.fadeOut('400', function () {
+            $error.fadeOut('400', function() {
                 $error.remove();
             });
         } else {
@@ -328,7 +328,7 @@ var Zconnected = (function ($) {
     function clearAllValidationError(animate) {
         //get all the validation errors
         var $validationErrors = $('.zconnected-error');
-        $validationErrors.each(function (index, element) {
+        $validationErrors.each(function(index, element) {
             hideValidationError($(element).attr('data-error-for'), animate);
         });
     }
@@ -420,14 +420,15 @@ var Zconnected = (function ($) {
             }
         }
     }
-    function ucfirst (str) {
-        return typeof str !="undefined"  ? (str += '', str[0].toUpperCase() + str.substr(1)) : '' ;
+
+    function ucfirst(str) {
+        return typeof str != "undefined" ? (str += '', str[0].toUpperCase() + str.substr(1)) : '';
     }
 })(jQuery);
 jQuery(Zconnected.init);
 
 jQuery.fn.extend({
-    getPath: function () {
+    getPath: function() {
         var path, node = this;
         while (node.length) {
             var realNode = node[0],
