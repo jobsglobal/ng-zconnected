@@ -1328,15 +1328,17 @@ var Zconnected = (function($) {
     }
 
     //Utility methods
-    function setCustomBackground() {
-        $('body').addClass('register_bg');
+    function setCustomBackground(customClass) {
+        customClass = customClass || 'register_bg';
+        $('body').addClass(customClass);
         $('.jomsocial').css({
             backgroundColor: 'transparent'
         });
     }
 
-    function removeCustomBackground() {
-        $('body').removeClass('register_bg');
+    function removeCustomBackground(customClass) {
+        customClass = customClass || 'register_bg';
+        $('body').removeClass(customClass);
         $('.jomsocial').css({
             backgroundColor: '#ecf0f1'
         });
@@ -1472,7 +1474,7 @@ var Zconnected = (function($) {
             }
             //set the data-error-for attribute of element to the elementSelector for future reference
             $error.attr('data-error-for', elementSelector);
-        };
+        }
         if (animate) {
             Zconnected.helpers.animateTextChange($(".zconnected-error[data-error-for='" + elementSelector + "']"), message);
         } else {
