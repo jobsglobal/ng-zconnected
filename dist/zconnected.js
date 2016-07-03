@@ -1031,8 +1031,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
     .provider('ngZconnected', [function() {
         var self = Zconnected;
-        this.setApiUrl = function(apiUrl) {
-            self.apiUrl = apiUrl;
+        this.setApiUrl = function(url) {
+            self.apiUrl = url;
         };
         this.$get = [function() {
             return self;
