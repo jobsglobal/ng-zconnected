@@ -1,78 +1,78 @@
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
-        var apiBase = ngZconnected.apiUrl;
+        var apiRoot = ngZconnected.apiUrl;
         var api = {
             countryList: {
-                api: $resource(apiBase + '/country'),
+                api: $resource(apiRoot + '/country'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             stateList: {
-                api: $resource(apiBase + '/country/:countryid/state'),
+                api: $resource(apiRoot + '/country/:countryid/state'),
 
                 get: function(countryid) {
                     return this.api.query({ countryid: countryid }).$promise;
                 }
             },
             cityList: {
-                api: $resource(apiBase + '/country/:countryid/state/:stateid/city'),
+                api: $resource(apiRoot + '/country/:countryid/state/:stateid/city'),
 
                 get: function(countryid, stateid) {
                     return this.api.query({ countryid: countryid, stateid: stateid }).$promise;
                 }
             },
             industryList: {
-                api: $resource(apiBase + '/industry'),
+                api: $resource(apiRoot + '/industry'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             contactTypeList: {
-                api: $resource(apiBase + '/contactType'),
+                api: $resource(apiRoot + '/contactType'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             imTypeList: {
-                api: $resource(apiBase + '/imType'),
+                api: $resource(apiRoot + '/imType'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             recommendationTemplateList: {
-                api: $resource(apiBase + '/testimonialRelationship'),
+                api: $resource(apiRoot + '/testimonialRelationship'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             languageProficiencyList: {
-                api: $resource(apiBase + '/language/proficiency'),
+                api: $resource(apiRoot + '/language/proficiency'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             languageList: {
-                api: $resource(apiBase + '/language'),
+                api: $resource(apiRoot + '/language'),
 
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             currencyList: {
-                api: $resource(apiBase + '/currency'),
+                api: $resource(apiRoot + '/currency'),
                 get: function() {
                     return this.api.query().$promise;
                 }
             },
             uniqId: {
-                api: $resource(apiBase + '/uniqid'),
+                api: $resource(apiRoot + '/uniqid'),
 
                 get: function() {
                     return this.api.get().$promise;
@@ -104,7 +104,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             companySizeList: {
                 get: function() {
                     var deferred = $q.defer();
-                    $http.get(Zconnected.apiUrl + '/company/size').success(function(resp) {
+                    $http.get(apiRoot + '/company/size').success(function(resp) {
                         deferred.resolve(resp);
                     }, function(error) {
                         deferred.reject(error);
