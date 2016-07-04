@@ -1040,18 +1040,22 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         self.setSuccessCallback = function(_successCallback) {
             successCallback = _successCallback;
         };
-        self.$get = ['tokenService', function(tokenService) {
+        self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
             return {
                 request: [function(config) {
                     var token = tokenProvider.getToken();
                     if (!token) {
-                        if (typeof(errorCallback) === "function") {
+                        if (Object.prototype.toString.call(errorCallback) === "[object Function]") {
                             errorCallback(config);
+                        } else if (Object.prototype.toString(errorCallback) === "[object Array]") {
+                            $injector.invoke(errorCallback);
                         }
 
                     } else {
-                        if (typeof(successCallback) === "function") {
+                        if (Object.prototype.toString(successCallback) === "[object Function]") {
                             successCallback(config);
+                        } else if (Object.prototype.toString(successCallback) === "[object Array]") {
+                            $injector.invoke(successCallback);
                         }
                     }
                     return config;
