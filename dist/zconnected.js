@@ -8,8 +8,20 @@ angular.module('ngJoms', [])
         return joms;
     }]);
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
-    .config(['$httpProvider', function($httpProvider) {
+    .config(['$httpProvider', 'httpRequestInterceptorProvider', function($httpProvider, httpRequestInterceptorProvider) {
         $httpProvider.interceptors.push('httpRequestInterceptor');
+        httpRequestInterceptorProvider.setErrorCallback(function(config) {
+
+            $logoutElement = angular.element('#logoutLink');
+            if ($logoutElement.length > 0) {
+                window.location.href = $logoutElement.attr('href');
+            } else {
+                window.location.href = '/logout';
+            }
+        });
+        httpRequestInterceptorProvider.setSuccessCallback(function(config) {
+            config.headers['Authorization'] = "Bearer " + token;
+        });
 
     }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
@@ -935,7 +947,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             uploadPhoto: function(id, companyid, jobid, file) {
                 var data = {};
-                data['photo'] = file;
+                data.photo = file;
                 return Upload.upload({
                     url: ngZconnected.apiUrl + '/employer/' + id + '/company/' + companyid + '/job/' + jobid + '/upload',
                     data: data
@@ -1018,24 +1030,36 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .factory('httpRequestInterceptor', ['tokenService', function(tokenProvider) {
-        return {
-            request: function(config) {
-                var token = tokenProvider.getToken();
-                if (!token) {
-                    $logoutElement = angular.element('#logoutLink');
-                    if ($logoutElement.length > 0) {
-                        window.location.href = $logoutElement.attr('href');
-                    } else {
-                        window.location.href = '/logout';
-                    }
-
-                } else {
-                    config.headers['Authorization'] = "Bearer " + token;
-                }
-                return config;
-            }
+    .provider('httpRequestInterceptor', [function() {
+        var self = this;
+        var errorCallback, successCallback;
+        self.setErrorCallback = function(_errorCallback) {
+            errorCallback = _errorCallback;
         };
+
+        self.setSuccessCallback = function(_successCallback) {
+            successCallback = _successCallback;
+        };
+        self.$get = ['tokenService', function(tokenService) {
+            return {
+                request: [function(config) {
+                    var token = tokenProvider.getToken();
+                    if (!token) {
+                        if (typeof(errorCallback) === "function") {
+                            errorCallback(config);
+                        }
+
+                    } else {
+                        if (typeof(successCallback) === "function") {
+                            successCallback(config);
+                        }
+                    }
+                    return config;
+                }]
+            };
+        }];
+        return self;
+
     }]);
 
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])

@@ -1,4 +1,4 @@
-<html ng-app="ngZconnected">
+<html>
 <title></title>
 
 <head>
@@ -9,11 +9,26 @@
 </head>
 
 <body>
-    <zloader></zloader>
+    <div data-ng-app="sample">
+        <div data-ng-controller="sampleController"></div>
+    </div>
     <!-- bower:js -->
     <!-- endbower -->
     <!-- inject:js -->
     <!-- endinject -->
+    <script type="text/javascript">
+    angular
+        .module('sample', ['ngZconnected'])
+        .config([function() {}])
+        .controller('sampleController', ['userService', 'httpRequestInterceptor', function(userService, httpRequestInterceptor) {
+            console.log(httpRequestInterceptor);
+            var vm = this;
+            userService.getCurrentUser()
+                .then(function(currentUser) {
+                    console.log(currentUser);
+                })
+        }]);
+    </script>
 </body>
 
 </html>
