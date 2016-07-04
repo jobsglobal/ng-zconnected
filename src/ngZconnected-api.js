@@ -10,9 +10,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 window.location.href = '/logout';
             }
         });
-        httpRequestInterceptorProvider.success(function() {
-            this.config.headers['Authorization'] = "Bearer " + token;
-        });
 
     }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
@@ -205,7 +202,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error);
                     });
                     return deferred.promise;
-                },
+                }
+            },
+            job: {
 
                 getJobGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
@@ -216,7 +215,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 },
-                getApplicantGeneralStatus: function(userId, companyId) {
+                getApplicantGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
                     $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
@@ -1049,18 +1048,16 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
             return {
                 request: function(config) {
-                    var $this = {
-                        config: config
-                    };
                     var token = tokenService.getToken();
                     if (!token) {
-                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString(error) === "[object Array]") {
-                            $injector.invoke(error, $this);
+                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
+                            $injector.invoke(error);
                         }
 
                     } else {
-                        if (Object.prototype.toString(success) === "[object Function]" || Object.prototype.toString(success) === "[object Array]") {
-                            $injector.invoke(error, $this);
+                        config.headers['Authorization'] = "Bearer " + token;
+                        if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
+                            $injector.invoke(error);
                         }
                     }
                     return config;
