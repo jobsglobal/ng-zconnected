@@ -19,9 +19,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 window.location.href = '/logout';
             }
         });
-        httpRequestInterceptorProvider.success(function() {
-            this.config.headers['Authorization'] = "Bearer " + token;
-        });
 
     }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
@@ -1043,18 +1040,16 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
             return {
                 request: function(config) {
-                    var $this = {
-                        config: config
-                    };
                     var token = tokenService.getToken();
                     if (!token) {
                         if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
-                            $injector.invoke(error, $this);
+                            $injector.invoke(error);
                         }
 
                     } else {
+                        config.headers['Authorization'] = "Bearer " + token;
                         if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
-                            $injector.invoke(error, $this);
+                            $injector.invoke(error);
                         }
                     }
                     return config;
