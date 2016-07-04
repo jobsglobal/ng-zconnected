@@ -31,13 +31,18 @@
                 console.log(this);
             });
         }])
-        .controller('sampleController', ['userService', 'httpRequestInterceptor', function(userService, httpRequestInterceptor) {
+        .controller('sampleController', ['userService', 'httpRequestInterceptor', 'authenticationService', function(userService, httpRequestInterceptor, authenticationService) {
             console.log(httpRequestInterceptor);
             var vm = this;
-            userService.getCurrentUser()
-                .then(function(currentUser) {
-                    console.log(currentUser);
+            authenticationService.login({
+                    username: 'test9@jobsglobal.com',
+                    password: 'User12345'
                 })
+                .then(function(resp) {
+                    console.log(resp);
+                }, function(error) {
+                    console.log(error);
+                });
         }]);
     </script>
 </body>

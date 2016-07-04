@@ -1062,6 +1062,23 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             };
         }];
         return self;
+    }])
+    .service('authenticationService', ['$q', '$cookies', 'ngZconnected', '$http', function($q, $cookies, ngZconnected, $http) {
+        var self = this;
+        var apiRoot = ngZconnected.apiUrl;
+        self.login = function(credentials) {
+            var deferred = $q.defer();
+            $http.post(apiRoot + '/login', credentials)
+                .then(function(resp) {
+                    if (resp.data && resp.data.data && resp.data.data.token) {
+                        $cookies.put('token', resp.data.data.token);
+                    }
+                    deferred.resolve(resp.data);
+                }, function(error) {
+                    deferred.reject(error.data);
+                });
+            return deferred.promise;
+        };
 
     }]);
 
