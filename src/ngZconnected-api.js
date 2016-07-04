@@ -1,4 +1,8 @@
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
+    .config(['$httpProvider', function($httpProvider) {
+        $httpProvider.interceptors.push('httpRequestInterceptor');
+
+    }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
@@ -1010,7 +1014,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             request: function(config) {
                 var token = tokenProvider.getToken();
                 if (!token) {
-                    window.location.href = angular.element('#logoutLink').attr('href');
+                    $logoutElement = angular.element('#logoutLink');
+                    if ($logoutElement.length > 0) {
+                        window.location.href = $logoutElement.attr('href');
+                    } else {
+                        window.location.href = '/logout';
+                    }
+
                 } else {
                     config.headers['Authorization'] = "Bearer " + token;
                 }
