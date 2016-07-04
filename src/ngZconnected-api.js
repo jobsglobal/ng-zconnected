@@ -924,11 +924,12 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .factory('jobService', ['$resource', 'Upload', 'ngZconnected', function($resource, Upload, ngZconnected) {
+    .factory('jobService', ['$resource', '$http', '$q', 'Upload', 'ngZconnected', function($resource, $http, $q, Upload, ngZconnected) {
+        var apiRoot = ngZonnected.apiUrl;
         return {
-            api: $resource(ngZconnected.apiUrl + "/employer/:id/company/:companyid/job/:jobid"),
+            api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid"),
             save: function(id, companyid, job) {
-                return $resource(ngZconnected.apiUrl + "/employer/:id/company/:companyid/job?social=1").save({
+                return $resource(apiRoot + "/employer/:id/company/:companyid/job?social=1").save({
                     id: id,
                     companyid: companyid
                 }, job).$promise;
@@ -940,12 +941,24 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 var data = {};
                 data.photo = file;
                 return Upload.upload({
-                    url: ngZconnected.apiUrl + '/employer/' + id + '/company/' + companyid + '/job/' + jobid + '/upload',
+                    url: apiRoot + '/employer/' + id + '/company/' + companyid + '/job/' + jobid + '/upload',
                     data: data
                 });
             },
+            getMostApplied: function(userId, companyId, $limit, $from, $to) {
+                var deferred = $q.defer();
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
+                if ($limit)
+                    url += '&limit=' + $limit;
+                $http.jsonp(url).then(function(resp) {
+                    deferred.resolve(resp.data);
+                }, function(error) {
+                    deferred.reject(error);
+                });
+                return deferred.promise;
+            },
             applicants: {
-                api: $resource(ngZconnected.apiUrl + "/employer/:id/company/:companyid/job/:jobid/applicants?limit=:limit&page=:page", {}, {
+                api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid/applicants?limit=:limit&page=:page", {}, {
                     query: {
                         method: 'GET',
                         isArray: false
@@ -979,19 +992,21 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 }
-
             },
-            getMostApplied: function(userId, companyId, $limit, $from, $to) {
-                var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
-                if ($limit)
-                    url += '&limit=' + $limit;
-                $http.jsonp(url).then(function(resp) {
-                    deferred.resolve(resp.data);
-                }, function(error) {
-                    deferred.reject(error);
-                });
-                return deferred.promise;
+            user: {
+                getApplied: function(userId, limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/applied?limit=' + limit + '&page=' + page;
+                    $http.get(url)
+                    .then(function(resp){
+                        deferred.resolve(resp.data);
+                    }, function(error){
+                        deferred.reject(error.data);
+                    })
+                    return deferred.promise;
+                }
             }
         };
     }])
