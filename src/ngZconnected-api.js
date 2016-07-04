@@ -202,7 +202,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error);
                     });
                     return deferred.promise;
-                },
+                }
+            },
+            job: {
 
                 getJobGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
@@ -213,7 +215,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 },
-                getApplicantGeneralStatus: function(userId, companyId) {
+                getApplicantGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
                     $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
