@@ -1,7 +1,7 @@
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
     .config(['$httpProvider', 'httpRequestInterceptorProvider', function($httpProvider, httpRequestInterceptorProvider) {
         $httpProvider.interceptors.push('httpRequestInterceptor');
-        httpRequestInterceptorProvider.setErrorCallback(function(config) {
+        httpRequestInterceptorProvider.error(function() {
 
             $logoutElement = angular.element('#logoutLink');
             if ($logoutElement.length > 0) {
@@ -10,8 +10,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 window.location.href = '/logout';
             }
         });
-        httpRequestInterceptorProvider.setSuccessCallback(function(config) {
-            config.headers['Authorization'] = "Bearer " + token;
+        httpRequestInterceptorProvider.success(function() {
+            this.config.headers['Authorization'] = "Bearer " + token;
         });
 
     }])
@@ -1023,34 +1023,33 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     }])
     .provider('httpRequestInterceptor', [function() {
         var self = this;
-        var errorCallback, successCallback;
-        self.setErrorCallback = function(_errorCallback) {
-            errorCallback = _errorCallback;
+        var error, success;
+        self.error = function(callback) {
+            error = callback;
         };
 
-        self.setSuccessCallback = function(_successCallback) {
-            successCallback = _successCallback;
+        self.success = function(callback) {
+            success = callback;
         };
         self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
             return {
-                request: [function(config) {
-                    var token = tokenProvider.getToken();
+                request: function(config) {
+                    var $this = {
+                        config: config
+                    };
+                    var token = tokenService.getToken();
                     if (!token) {
-                        if (Object.prototype.toString.call(errorCallback) === "[object Function]") {
-                            errorCallback(config);
-                        } else if (Object.prototype.toString(errorCallback) === "[object Array]") {
-                            $injector.invoke(errorCallback);
+                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString(error) === "[object Array]") {
+                            $injector.invoke(error, $this);
                         }
 
                     } else {
-                        if (Object.prototype.toString(successCallback) === "[object Function]") {
-                            successCallback(config);
-                        } else if (Object.prototype.toString(successCallback) === "[object Array]") {
-                            $injector.invoke(successCallback);
+                        if (Object.prototype.toString(success) === "[object Function]" || Object.prototype.toString(success) === "[object Array]") {
+                            $injector.invoke(error, $this);
                         }
                     }
                     return config;
-                }]
+                }
             };
         }];
         return self;

@@ -1,12 +1,13 @@
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
     .provider('ngZconnected', [function() {
-        var self = Zconnected;
+        var self = this;
         this.setApiUrl = function(url) {
-            self.apiUrl = url;
+            Zconnected.apiUrl = url;
         };
         this.$get = [function() {
-            return self;
+            return Zconnected;
         }];
+        return self;
     }])
     .directive('nonZero', function() {
         return {

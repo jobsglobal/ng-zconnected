@@ -19,7 +19,18 @@
     <script type="text/javascript">
     angular
         .module('sample', ['ngZconnected'])
-        .config([function() {}])
+        .config(['httpRequestInterceptorProvider', 'ngZconnectedProvider', function(httpRequestInterceptorProvider, ngZconnectedProvider) {
+            ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
+            httpRequestInterceptorProvider.success(function() {
+                // body...
+                console.log(this);
+            });
+
+            httpRequestInterceptorProvider.error(function() {
+                // body...
+                console.log(this);
+            });
+        }])
         .controller('sampleController', ['userService', 'httpRequestInterceptor', function(userService, httpRequestInterceptor) {
             console.log(httpRequestInterceptor);
             var vm = this;
