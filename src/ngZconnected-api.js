@@ -1039,12 +1039,12 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     };
                     var token = tokenService.getToken();
                     if (!token) {
-                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString(error) === "[object Array]") {
+                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
                             $injector.invoke(error, $this);
                         }
 
                     } else {
-                        if (Object.prototype.toString(success) === "[object Function]" || Object.prototype.toString(success) === "[object Array]") {
+                        if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
                             $injector.invoke(error, $this);
                         }
                     }
