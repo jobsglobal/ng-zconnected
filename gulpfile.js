@@ -15,7 +15,7 @@ var del = require('del');
 var angularTemplatecache = require('gulp-angular-templatecache');
 var addStream = require('add-stream');
 gulp.task('sample', function() {
-    var files = gulp.src(['src/**/*.js', 'src/**/*.css', 'src/**/*.less', 'dist/**/zconnected.js'])
+    var files = gulp.src(['dist/**/zconnected.js'])
         .pipe(_if('*.js', angularFilesort()));
     gulp.src('sample/index.html')
         .pipe(wiredep({

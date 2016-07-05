@@ -21,18 +21,8 @@
         .module('sample', ['ngZconnected'])
         .config(['httpRequestInterceptorProvider', 'ngZconnectedProvider', function(httpRequestInterceptorProvider, ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
-            httpRequestInterceptorProvider.success(function() {
-                // body...
-                console.log(this);
-            });
-
-            httpRequestInterceptorProvider.error(function() {
-                // body...
-                console.log(this);
-            });
         }])
-        .controller('sampleController', ['userService', 'httpRequestInterceptor', 'authenticationService', function(userService, httpRequestInterceptor, authenticationService) {
-            console.log(httpRequestInterceptor);
+        .controller('sampleController', ['userService', 'authenticationService', function(userService, authenticationService) {
             var vm = this;
             authenticationService.login({
                     username: 'test9@jobsglobal.com',
@@ -40,6 +30,12 @@
                 })
                 .then(function(resp) {
                     console.log(resp);
+                    userService.getCurrentUser()
+                        .then(function(currentUser) {
+                            console.log(currentUser);
+                        }, function(error) {
+                            console.log(error);
+                        })
                 }, function(error) {
                     console.log(error);
                 });

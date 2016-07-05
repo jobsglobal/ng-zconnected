@@ -1039,27 +1039,35 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     }])
     .provider('httpRequestInterceptor', [function() {
         var self = this;
-        var error, success;
+        var errorCallbacks = [],
+            successCallbacks = [];
         self.error = function(callback) {
-            error = callback;
+            errorCallbacks.push(callback);
         };
 
         self.success = function(callback) {
-            success = callback;
+            successCallbacks.push(callback);
         };
-        self.$get = ['authenticationService', '$injector', function(authenticationService, $injector) {
+        self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
             return {
                 request: function(config) {
-                    var token = authenticationService.getToken();
-                    if (!token || authenticationService.isAuthed()) {
-                        if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
-                            $injector.invoke(error);
-                        }
+                    if (!config.excludeFromInterceptor) {
+                        var token = tokenService.getToken();
+                        if (token && tokenService.isAuthed()) {
+                            config.headers['Authorization'] = "Bearer " + token;
+                            successCallbacks.forEach(function(success, index) {
+                                if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
+                                    $injector.invoke(success);
+                                }
+                            });
 
-                    } else {
-                        config.headers['Authorization'] = "Bearer " + token;
-                        if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
-                            $injector.invoke(error);
+                        } else {
+                            errorCallbacks.forEach(function(error, index) {
+                                if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
+                                    $injector.invoke(error);
+                                }
+                            });
+
                         }
                     }
                     return config;
@@ -1068,14 +1076,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         }];
         return self;
     }])
-    .service('authenticationService', ['$q', '$cookies', 'ngZconnected', '$http', function($q, $cookies, ngZconnected, $http) {
+    .service('authenticationService', ['tokenService', 'ngZconnected', '$http', '$q', function(tokenService, ngZconnected, $http, $q) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.logout = function() {
             var deferred = $q.defer();
-            $http.get(apiRoot + '/logout')
+            $http({
+                    method: 'GET',
+                    url: apiRoot + '/logout'
+
+                })
                 .then(function(resp) {
-                    $cookies.remove('token');
+                    tokenService.removeToken();
                     deferred.resolve(resp.data);
                 }, function(error) {
                     deferred.reject(error.data);
@@ -1084,10 +1096,15 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         };
         self.login = function(credentials) {
             var deferred = $q.defer();
-            $http.post(apiRoot + '/login', credentials)
+            $http({
+                    method: 'POST',
+                    url: apiRoot + '/login',
+                    data: credentials,
+                    excludeFromInterceptor: true
+                })
                 .then(function(resp) {
                     if (resp.data && resp.data.data && resp.data.data.token) {
-                        $cookies.put('token', resp.data.data.token);
+                        tokenService.setToken(resp.data.data.token);
                     }
                     deferred.resolve(resp.data);
                 }, function(error) {
@@ -1095,6 +1112,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 });
             return deferred.promise;
         };
+    }])
+    .service('tokenService', ['$cookies', '$window', function($cookies, $window) {
+        var self = this;
         self.parseJwt = function(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace('-', '+').replace('_', '/');
@@ -1102,6 +1122,12 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         };
         self.getToken = function() {
             return $cookies.get('token');
+        };
+        self.removeToken = function() {
+            return $cookies.remove('token');
+        };
+        self.setToken = function(token) {
+            $cookies.put('token', token);
         };
         self.isAuthed = function() {
             var token = self.getToken();
@@ -1729,5 +1755,5 @@ jQuery.fn.extend({
     }
 });
 
-angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\r\n    <div class=\"sk-circle\">\r\n        <div class=\"sk-circle1 sk-child\"></div>\r\n        <div class=\"sk-circle2 sk-child\"></div>\r\n        <div class=\"sk-circle3 sk-child\"></div>\r\n        <div class=\"sk-circle4 sk-child\"></div>\r\n        <div class=\"sk-circle5 sk-child\"></div>\r\n        <div class=\"sk-circle6 sk-child\"></div>\r\n        <div class=\"sk-circle7 sk-child\"></div>\r\n        <div class=\"sk-circle8 sk-child\"></div>\r\n        <div class=\"sk-circle9 sk-child\"></div>\r\n        <div class=\"sk-circle10 sk-child\"></div>\r\n        <div class=\"sk-circle11 sk-child\"></div>\r\n        <div class=\"sk-circle12 sk-child\"></div>\r\n    </div>\r\n</div>\r\n");
-$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\r\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\r\n</ul>\r\n");}]);
+angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\n    <div class=\"sk-circle\">\n        <div class=\"sk-circle1 sk-child\"></div>\n        <div class=\"sk-circle2 sk-child\"></div>\n        <div class=\"sk-circle3 sk-child\"></div>\n        <div class=\"sk-circle4 sk-child\"></div>\n        <div class=\"sk-circle5 sk-child\"></div>\n        <div class=\"sk-circle6 sk-child\"></div>\n        <div class=\"sk-circle7 sk-child\"></div>\n        <div class=\"sk-circle8 sk-child\"></div>\n        <div class=\"sk-circle9 sk-child\"></div>\n        <div class=\"sk-circle10 sk-child\"></div>\n        <div class=\"sk-circle11 sk-child\"></div>\n        <div class=\"sk-circle12 sk-child\"></div>\n    </div>\n</div>\n");
+$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\n</ul>\n");}]);
