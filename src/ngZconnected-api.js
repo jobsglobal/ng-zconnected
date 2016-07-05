@@ -352,8 +352,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             userEmail: {
                 api: $resource(apiRoot + '/user/:id/email/:emailid', null, { update: { method: 'PUT' } }),
 
-                get: function(id) {
-                    return this.api.get({ id: id }).$promise;
+                get: function(id, emailid) {
+                    return this.api.get({ id: id, emailid: emailid }).$promise;
                 },
                 query: function(id) {
                     return this.api.query({ id: id }).$promise;
@@ -374,8 +374,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             userAddress: {
                 api: $resource(apiRoot + '/user/:id/address/:addressid', null, { update: { method: 'PUT' } }),
 
-                get: function(id) {
-                    return this.api.get({ id: id }).$promise;
+                get: function(id, addressid) {
+                    return this.api.get({ id: id, addressid: addressid }).$promise;
                 },
                 query: function(id) {
                     return this.api.query({ id: id }).$promise;
@@ -414,8 +414,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             jobseekerIm: {
                 api: $resource(apiRoot + '/jobseeker/:id/im/:imid', null, { update: { method: 'PUT' } }),
 
-                get: function(id) {
-                    return this.api.get({ id: id }).$promise;
+                get: function(id, imid) {
+                    return this.api.get({ id: id, imid: imid }).$promise;
                 },
                 query: function(id) {
                     return this.api.query({ id: id }).$promise;
@@ -470,8 +470,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             jobseekerEducation: {
                 api: $resource(apiRoot + '/jobseeker/:id/education/:educid', null, { update: { method: 'PUT' } }),
 
-                get: function(id) {
-                    return this.api.get({ id: id }).$promise;
+                get: function(id, educid) {
+                    return this.api.get({ id: id, educid: educid }).$promise;
                 },
                 query: function(id) {
                     return this.api.query({ id: id }).$promise;
@@ -525,8 +525,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             jobseekerLanguage: {
                 api: $resource(apiRoot + '/jobseeker/:id/language/:langid', null, { update: { method: 'PUT' } }),
 
-                get: function(id) {
-                    return this.api.get({ id: id }).$promise;
+                get: function(id, langid) {
+                    return this.api.get({ id: id, langid: langid }).$promise;
                 },
                 query: function(id) {
                     return this.api.query({ id: id }).$promise;
