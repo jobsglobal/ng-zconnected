@@ -1,7 +1,7 @@
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
-    .config(['$httpProvider', 'httpRequestInterceptorProvider', function($httpProvider, httpRequestInterceptorProvider) {
-        $httpProvider.interceptors.push('httpRequestInterceptor');
-        httpRequestInterceptorProvider.error(function() {
+    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+        authenticationInterceptorProvider.error(function() {
 
             $logoutElement = angular.element('#logoutLink');
             if ($logoutElement.length > 0) {
@@ -1072,7 +1072,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .provider('httpRequestInterceptor', [function() {
+    .provider('authenticationInterceptor', [function() {
         var self = this;
         var errorCallbacks = [],
             successCallbacks = [];
