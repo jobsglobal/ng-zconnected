@@ -924,7 +924,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         };
     }])
     .factory('jobService', ['$resource', '$http', '$q', 'Upload', 'ngZconnected', function($resource, $http, $q, Upload, ngZconnected) {
-        var apiRoot = ngZonnected.apiUrl;
+        var apiRoot = ngZconnected.apiUrl;
         return {
             api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid"),
             save: function(id, companyid, job) {
