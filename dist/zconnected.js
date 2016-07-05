@@ -15,8 +15,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             $logoutElement = angular.element('#logoutLink');
             if ($logoutElement.length > 0) {
                 window.location.href = $logoutElement.attr('href');
-            } else {
-                window.location.href = '/logout';
             }
         });
 
