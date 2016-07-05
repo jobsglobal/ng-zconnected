@@ -10,7 +10,9 @@
 
 <body>
     <div data-ng-app="sample">
-        <div data-ng-controller="sampleController"></div>
+        <div data-ng-controller="sampleController as vm">
+            <pre data-ng-bind="vm.currentUser | json"></pre>
+        </div>
     </div>
     <!-- bower:js -->
     <!-- endbower -->
@@ -22,20 +24,19 @@
         .config(['httpRequestInterceptorProvider', 'ngZconnectedProvider', function(httpRequestInterceptorProvider, ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
-        .controller('sampleController', ['userService', 'authenticationService', function(userService, authenticationService) {
+        .controller('sampleController', ['$q', 'userService', 'authenticationService', function($q, userService, authenticationService) {
             var vm = this;
-            authenticationService.login({
+            $q.when(authenticationService.login({
                     username: 'test9@jobsglobal.com',
                     password: 'User12345'
-                })
+                }))
                 .then(function(resp) {
                     console.log(resp);
-                    userService.getCurrentUser()
-                        .then(function(currentUser) {
-                            console.log(currentUser);
-                        }, function(error) {
-                            console.log(error);
-                        })
+                    return userService.getCurrentUser();
+                })
+                .then(function(currentUser) {
+                    console.log(currentUser);
+                    vm.currentUser = currentUser;
                 }, function(error) {
                     console.log(error);
                 });

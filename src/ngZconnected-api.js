@@ -1036,18 +1036,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return {
             getCurrentUser: function() {
                 var deferred = $q.defer();
-                var currentUser = angular.fromJson($window.localStorage['currentUser']);
-                if (!currentUser) {
-                    $http.get(apiRoot + '/user/current')
-                        .then(function(resp) {
-                            $window.localStorage['currentUser'] = angular.toJson(resp.data);
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                } else {
-                    deferred.resolve(currentUser);
-                }
+                // var currentUser = angular.fromJson($window.localStorage['currentUser']);
+                // if (!currentUser) {
+                $http.get(apiRoot + '/user/current', { cache: true })
+                    .then(function(resp) {
+                        // $window.localStorage['currentUser'] = angular.toJson(resp.data);
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                // } else {
+                //     deferred.resolve(currentUser);
+                // }
                 return deferred.promise;
             },
             getCurrentUserFriends: function() {
@@ -1090,18 +1090,21 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         var token = tokenService.getToken();
                         if (token && tokenService.isAuthed()) {
                             config.headers['Authorization'] = "Bearer " + token;
-                            successCallbacks.forEach(function(success, index) {
+                            for (var x = 0; x < successCallbacks.length; x++) {
+                                var success = successCallbacks[x];
                                 if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
                                     $injector.invoke(success);
                                 }
-                            });
+                            }
 
                         } else {
-                            errorCallbacks.forEach(function(error, index) {
+                            for (var x = 0; x < errorCallbacks.length; x++) {
+                                var error = errorCallbacks[x];
+
                                 if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
                                     $injector.invoke(error);
                                 }
-                            });
+                            }
 
                         }
                     }
