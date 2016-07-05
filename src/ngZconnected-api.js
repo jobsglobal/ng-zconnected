@@ -1033,22 +1033,44 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .factory('userService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
+    .factory('userService', ['$http', '$q', '$window', 'ngZconnected', function($http, $q, $window, ngZconnected) {
         var apiRoot = ngZconnected.apiUrl;
         return {
             getCurrentUser: function() {
-                return $resource(apiRoot + '/user/current').get().$promise;
+                var deferred = $q.defer();
+                var currentUser = $window.localStorage['currentUser'];
+                if (!currentUser) {
+                    $http.get(apiRoot + '/user/current')
+                        .then(function(resp) {
+                            $window.localStorage['currentUser'] = resp.data;
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                } else {
+                    deferred.resolve(currentUser);
+                }
+                return deferred.promise;
             },
             getCurrentUserFriends: function() {
-                return $resource(apiRoot + '/user/current/friends').get().$promise;
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/user/current/friends')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
             },
             getCurrentUserSuggestedUsers: function(limit, page) {
-                return $resource(apiRoot + '/user/current/suggestedUsers?limit=:limit&page=:page', {}, {
-                    query: {
-                        method: 'GET',
-                        isArray: false
-                    }
-                }).query({ limit: limit, page: page }).$promise;
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/user/current/suggestedUsers?limit=' + limit + 'page=' + page)
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
             }
         };
     }])
