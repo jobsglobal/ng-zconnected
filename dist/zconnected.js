@@ -1045,11 +1045,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return {
             getCurrentUser: function() {
                 var deferred = $q.defer();
-                var currentUser = $window.localStorage['currentUser'];
+                var currentUser = angular.fromJson($window.localStorage['currentUser']);
                 if (!currentUser) {
                     $http.get(apiRoot + '/user/current')
                         .then(function(resp) {
-                            $window.localStorage['currentUser'] = resp.data;
+                            $window.localStorage['currentUser'] = angular.toJson(resp.data);
                             deferred.resolve(resp.data);
                         }, function(error) {
                             deferred.reject(error.data);
