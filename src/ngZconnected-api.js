@@ -133,6 +133,31 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     deferred.reject(error);
                 });
                 return deferred.promise;
+            },
+            modules: {
+                getAll: getModules = function() {
+                    var deferred = $q.defer();
+                    $http.jsonp(apiRoot + '/module?callback=JSON_CALLBACK').then(function(resp) {
+                        deferred.resolve(resp.data.data);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                },
+                getModule: function(moduleName) {
+
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/module?name=' + moduleName, {
+                        headers: {
+                            "Content-Type": 'text/html'
+                        }
+                    }).then(function(resp) {
+                        deferred.resolve((resp.data.data) ? resp.data.data : resp.data);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                },
             }
         };
 
