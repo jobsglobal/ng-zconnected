@@ -999,11 +999,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     var deferred = $q.defer();
                     var url = apiRoot + '/jobseeker/' + userId + '/job/applied?limit=' + limit + '&page=' + page;
                     $http.get(url)
-                    .then(function(resp){
-                        deferred.resolve(resp.data);
-                    }, function(error){
-                        deferred.reject(error.data);
-                    })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
                     return deferred.promise;
                 }
             }
@@ -1028,13 +1028,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .factory('tokenService', ['$cookies', function($cookies) {
-        return {
-            getToken: function() {
-                return $cookies.get('token');
-            }
-        };
-    }])
     .provider('httpRequestInterceptor', [function() {
         var self = this;
         var error, success;
@@ -1045,11 +1038,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         self.success = function(callback) {
             success = callback;
         };
-        self.$get = ['tokenService', '$injector', function(tokenService, $injector) {
+        self.$get = ['authenticationService', '$injector', function(authenticationService, $injector) {
             return {
                 request: function(config) {
-                    var token = tokenService.getToken();
-                    if (!token) {
+                    var token = authenticationService.getToken();
+                    if (!token || authenticationService.isAuthed()) {
                         if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
                             $injector.invoke(error);
                         }
@@ -1069,6 +1062,17 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     .service('authenticationService', ['$q', '$cookies', 'ngZconnected', '$http', function($q, $cookies, ngZconnected, $http) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
+        self.logout = function() {
+            var deferred = $q.defer();
+            $http.get(apiRoot + '/logout')
+                .then(function(resp) {
+                    $cookies.remove('token');
+                    deferred.resolve(resp.data);
+                }, function(error) {
+                    deferred.reject(error.data);
+                });
+            return deferred.promise;
+        };
         self.login = function(credentials) {
             var deferred = $q.defer();
             $http.post(apiRoot + '/login', credentials)
@@ -1082,5 +1086,21 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 });
             return deferred.promise;
         };
-
+        self.parseJwt = function(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace('-', '+').replace('_', '/');
+            return JSON.parse($window.atob(base64));
+        };
+        self.getToken = function() {
+            return $cookies.get('token');
+        };
+        self.isAuthed = function() {
+            var token = self.getToken();
+            if (token) {
+                var params = self.parseJwt(token);
+                return Math.round(new Date().getTime() / 1000) <= params.exp;
+            } else {
+                return false;
+            }
+        };
     }]);
