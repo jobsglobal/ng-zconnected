@@ -216,7 +216,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 getBranch: function() {
 
                 },
-                getTimelineHtml: function(argument) {
+                getTimelineHtml: function(userId, companyId) {
                     var deferred = $q.defer();
                     $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
