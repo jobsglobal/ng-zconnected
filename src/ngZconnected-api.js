@@ -1019,6 +1019,32 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                             deferred.reject(error.data);
                         })
                     return deferred.promise;
+                },
+                getSaved: function(userId, limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/saved?limit=' + limit + '&page=' + page;
+                    $http.get(url)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
+                },
+                getRecommended: function(userId, limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/recommended?limit=' + limit + '&page=' + page;
+                    $http.get(url)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
                 }
             }
         };
