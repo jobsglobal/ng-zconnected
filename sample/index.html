@@ -12,7 +12,7 @@
     <div data-ng-app="sample">
         <div data-ng-controller="sampleController as vm">
             <pre data-ng-bind="vm.currentUser | json"></pre>
-            <iframe data-ng-bind-html="vm.moduleHtml | html"></iframe>
+            <iframe data-ng-src="{{vm.moduleUrl}}"></iframe>
         </div>
     </div>
     <!-- bower:js -->
@@ -38,10 +38,7 @@
                 .then(function(currentUser) {
                     console.log(currentUser);
                     vm.currentUser = currentUser;
-                    return resourceService.modules.getByName('mod_job_post');
-                })
-                .then(function(module) {
-                    vm.moduleHtml = module;
+                    vm.moduleUrl = resourceService.modules.getUrlByName('mod_job_post');
                 })
                 .catch(function(error) {
                     console.log(error);
