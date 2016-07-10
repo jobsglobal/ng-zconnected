@@ -142,7 +142,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getByName: function(moduleName) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/module?name=' + moduleName, {
+                    $http.get(apiRoot + '/module/' + moduleName, {
                         headers: {
                             "Content-Type": 'text/html'
                         }
