@@ -1050,6 +1050,16 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
                 return deferred.promise;
             },
+            getUserFriends: function(userId, limit, page){
+            var deferred = $q.defer();
+                $http.get(apiRoot + '/user/' + userId + '/userfriend?limit=' + limit + 'page=' + page)
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
             getCurrentUserFriends: function() {
                 var deferred = $q.defer();
                 $http.get(apiRoot + '/user/current/friends')
