@@ -153,6 +153,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 },
+                generateUrlWithName: function(moduleName) {
+                    return apiRoot + '/module/' + moduleName;
+                }
             }
         };
 
@@ -1360,7 +1363,12 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
                 });
             }
         };
-    });
+    })
+    .filter('html', ['$sce', function($sce) {
+        return function(text) {
+            return $sce.trustAsHtml(text);
+        };
+    }]);
 
 var Zconnected = (function($) {
     var _DEBUG = true;

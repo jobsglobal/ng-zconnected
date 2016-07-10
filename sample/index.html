@@ -12,6 +12,7 @@
     <div data-ng-app="sample">
         <div data-ng-controller="sampleController as vm">
             <pre data-ng-bind="vm.currentUser | json"></pre>
+            <iframe data-ng-bind-html="vm.moduleHtml | html"></iframe>
         </div>
     </div>
     <!-- bower:js -->
@@ -24,7 +25,7 @@
         .config(['ngZconnectedProvider', function(ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
-        .controller('sampleController', ['$q', 'userService', 'authenticationService', function($q, userService, authenticationService) {
+        .controller('sampleController', ['$q', 'userService', 'authenticationService', 'resourceService', function($q, userService, authenticationService, resourceService) {
             var vm = this;
             $q.when(authenticationService.login({
                     username: 'test9@jobsglobal.com',
@@ -37,7 +38,12 @@
                 .then(function(currentUser) {
                     console.log(currentUser);
                     vm.currentUser = currentUser;
-                }, function(error) {
+                    return resourceService.modules.getByName('mod_job_post');
+                })
+                .then(function(module) {
+                    vm.moduleHtml = module;
+                })
+                .catch(function(error) {
                     console.log(error);
                 });
         }]);

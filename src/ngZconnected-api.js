@@ -144,6 +144,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 },
+                generateUrlWithName: function(moduleName) {
+                    return apiRoot + '/module/' + moduleName;
+                }
             }
         };
 
