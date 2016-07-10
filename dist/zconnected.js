@@ -8,17 +8,6 @@ angular.module('ngJoms', [])
         return joms;
     }]);
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
-    .config(['$httpProvider', 'httpRequestInterceptorProvider', function($httpProvider, httpRequestInterceptorProvider) {
-        $httpProvider.interceptors.push('httpRequestInterceptor');
-        httpRequestInterceptorProvider.error(function() {
-
-            $logoutElement = angular.element('#logoutLink');
-            if ($logoutElement.length > 0) {
-                window.location.href = $logoutElement.attr('href');
-            }
-        });
-
-    }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
@@ -153,7 +142,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getByName: function(moduleName) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/module?name=' + moduleName, {
+                    $http.get(apiRoot + '/module/' + moduleName, {
                         headers: {
                             "Content-Type": 'text/html'
                         }
@@ -164,6 +153,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                     return deferred.promise;
                 },
+                generateUrlWithName: function(moduleName) {
+                    return apiRoot + '/module/' + moduleName;
+                }
             }
         };
 
@@ -225,7 +217,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 getBranch: function() {
 
                 },
-                getTimelineHtml: function(argument) {
+                getTimelineHtml: function(userId, companyId) {
                     var deferred = $q.defer();
                     $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
@@ -1045,18 +1037,28 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return {
             getCurrentUser: function() {
                 var deferred = $q.defer();
-                var currentUser = angular.fromJson($window.localStorage['currentUser']);
-                if (!currentUser) {
-                    $http.get(apiRoot + '/user/current')
-                        .then(function(resp) {
-                            $window.localStorage['currentUser'] = angular.toJson(resp.data);
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                } else {
-                    deferred.resolve(currentUser);
-                }
+                // var currentUser = angular.fromJson($window.localStorage['currentUser']);
+                // if (!currentUser) {
+                $http.get(apiRoot + '/user/current', { cache: true })
+                    .then(function(resp) {
+                        // $window.localStorage['currentUser'] = angular.toJson(resp.data);
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                // } else {
+                //     deferred.resolve(currentUser);
+                // }
+                return deferred.promise;
+            },
+            getUserFriends: function(userId, limit, page){
+            var deferred = $q.defer();
+                $http.get(apiRoot + '/user/' + userId + '/userfriend?limit=' + limit + 'page=' + page)
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
                 return deferred.promise;
             },
             getCurrentUserFriends: function() {
@@ -1081,7 +1083,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .provider('httpRequestInterceptor', [function() {
+    .provider('authenticationInterceptor', [function() {
         var self = this;
         var errorCallbacks = [],
             successCallbacks = [];
@@ -1099,18 +1101,21 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         var token = tokenService.getToken();
                         if (token && tokenService.isAuthed()) {
                             config.headers['Authorization'] = "Bearer " + token;
-                            successCallbacks.forEach(function(success, index) {
+                            for (var x = 0; x < successCallbacks.length; x++) {
+                                var success = successCallbacks[x];
                                 if (Object.prototype.toString.call(success) === "[object Function]" || Object.prototype.toString.call(success) === "[object Array]") {
                                     $injector.invoke(success);
                                 }
-                            });
+                            }
 
                         } else {
-                            errorCallbacks.forEach(function(error, index) {
+                            for (var x = 0; x < errorCallbacks.length; x++) {
+                                var error = errorCallbacks[x];
+
                                 if (Object.prototype.toString.call(error) === "[object Function]" || Object.prototype.toString.call(error) === "[object Array]") {
                                     $injector.invoke(error);
                                 }
-                            });
+                            }
 
                         }
                     }
@@ -1185,6 +1190,17 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     }]);
 
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
+    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+        authenticationInterceptorProvider.error(function() {
+
+            $logoutElement = angular.element('#logoutLink');
+            if ($logoutElement.length > 0) {
+                window.location.href = $logoutElement.attr('href');
+            }
+        });
+
+    }])
     .provider('ngZconnected', [function() {
         var self = this;
         this.setApiUrl = function(url) {
@@ -1250,7 +1266,7 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
         return {
             restrict: 'E',
             templateUrl: '/templates/ngLoader.html'
-        }
+        };
     })
     .directive('dateConverter', function() {
         return {
@@ -1338,7 +1354,31 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
             }
 
         };
-    });
+    })
+    .directive('scrollToError', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elem) {
+
+                // set up event handler on the form element
+                elem.on('submit', function() {
+
+                    // find the first invalid element
+                    var firstInvalid = elem[0].querySelector('.ng-invalid');
+
+                    // if we find one, set focus
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                });
+            }
+        };
+    })
+    .filter('html', ['$sce', function($sce) {
+        return function(text) {
+            return $sce.trustAsHtml(text);
+        };
+    }]);
 
 var Zconnected = (function($) {
     var _DEBUG = true;
