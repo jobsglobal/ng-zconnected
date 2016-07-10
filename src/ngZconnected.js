@@ -1,4 +1,15 @@
 angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
+    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+        authenticationInterceptorProvider.error(function() {
+
+            $logoutElement = angular.element('#logoutLink');
+            if ($logoutElement.length > 0) {
+                window.location.href = $logoutElement.attr('href');
+            }
+        });
+
+    }])
     .provider('ngZconnected', [function() {
         var self = this;
         this.setApiUrl = function(url) {
@@ -64,7 +75,7 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
         return {
             restrict: 'E',
             templateUrl: '/templates/ngLoader.html'
-        }
+        };
     })
     .directive('dateConverter', function() {
         return {
@@ -151,5 +162,24 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
                 }
             }
 
+        };
+    })
+    .directive('scrollToError', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elem) {
+
+                // set up event handler on the form element
+                elem.on('submit', function() {
+
+                    // find the first invalid element
+                    var firstInvalid = elem[0].querySelector('.ng-invalid');
+
+                    // if we find one, set focus
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                });
+            }
         };
     });

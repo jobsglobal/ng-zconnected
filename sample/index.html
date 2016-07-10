@@ -21,7 +21,7 @@
     <script type="text/javascript">
     angular
         .module('sample', ['ngZconnected'])
-        .config(['httpRequestInterceptorProvider', 'ngZconnectedProvider', function(httpRequestInterceptorProvider, ngZconnectedProvider) {
+        .config(['ngZconnectedProvider', function(ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
         .controller('sampleController', ['$q', 'userService', 'authenticationService', function($q, userService, authenticationService) {

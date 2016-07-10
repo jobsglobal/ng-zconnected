@@ -1,15 +1,4 @@
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
-    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
-        $httpProvider.interceptors.push('authenticationInterceptor');
-        authenticationInterceptorProvider.error(function() {
-
-            $logoutElement = angular.element('#logoutLink');
-            if ($logoutElement.length > 0) {
-                window.location.href = $logoutElement.attr('href');
-            }
-        });
-
-    }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
