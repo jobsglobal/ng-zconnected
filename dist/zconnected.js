@@ -590,11 +590,20 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
         return store;
     }])
-    .factory('registrationService', ['$http', '$resource', function($http, $resource) {
+    .service('registrationService', ['$http', '$resource', 'ngZconnected', function($http, $resource, ngZconnected) {
         'use strict';
-        var store = {};
-
-        return store;
+        var self = this;
+        var apiRoot = ngZconnected.apiUrl;
+        var apiUrl = apiRoot + '/signup';
+        self.api = $resource(apiUrl, null, {
+            parsedCvSignup: {
+                method: 'POST',
+                url: apiUrl + '/savedata'
+            }
+        });
+        self.parsedCvSignup = function(parsedCv) {
+            return self.api.parsedCvSignup({}, parsedCv).$promise;
+        };
     }])
     .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
         var self = this;
