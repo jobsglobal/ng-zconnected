@@ -808,7 +808,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
             }),
             saveToCompany: function(userId, companyId, cvId) {
-                return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId });
+                return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search?limit=' + limit + '&page=' + page;
