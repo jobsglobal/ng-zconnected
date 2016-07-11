@@ -1055,6 +1055,21 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         })
                     return deferred.promise;
                 }
+            },
+            jobs: {
+                getJobs: function(limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/job/latest?limit=' + limit + '&page=' + page;
+                    $http.get(url)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
+                }
             }
         };
     }])
