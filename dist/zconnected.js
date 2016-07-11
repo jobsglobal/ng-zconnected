@@ -812,8 +812,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         self.cv = {
             baseUrl: apiRoot + '/employer/:userId/company/:companyId/cv/:cvId',
             api: $resource(this.baseUrl, { cvId: '@id' }, {}),
-            saveToCompany: function(userId, companyId, cv) {
-                return this.api.save({ userId: userId, companyId: companyId }, cv);
+            saveToCompany: function(userId, companyId, cvId) {
+                return this.api.save({ userId: userId, companyId: companyId }, { uploadId: cvId });
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search?limit=' + limit + '&page=' + page;
