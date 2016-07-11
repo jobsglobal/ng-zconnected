@@ -802,7 +802,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         };
         self.cv = {
             baseUrl: apiRoot + '/employer/:userId/company/:companyId/cv/:cvId',
-            api: $resource(this.baseUrl, { cvId: '@id' }, {}),
+            api: $resource(this.baseUrl, { cvId: '@id' }),
+            saveToCompany: function(userId, companyId, cvId) {
+                return this.api.save({ userId: userId, companyId: companyId }, { uploadId: cvId });
+            },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search?limit=' + limit + '&page=' + page;
 
@@ -1083,8 +1086,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 // }
                 return deferred.promise;
             },
-            getUserFriends: function(userId, limit, page){
-            var deferred = $q.defer();
+            getUserFriends: function(userId, limit, page) {
+                var deferred = $q.defer();
                 $http.get(apiRoot + '/user/' + userId + '/userfriend?limit=' + limit + '&page=' + page)
                     .then(function(resp) {
                         deferred.resolve(resp.data);
