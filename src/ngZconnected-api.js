@@ -1063,6 +1063,20 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                             deferred.reject(error.data);
                         })
                     return deferred.promise;
+                },
+                getJobSearch: function(search, limit, page, country) {
+                    country = country || '';
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/job/search?search=' + search + '&country=' + country + '&limit=' + limit + '&page=' + page;
+                    $http.get(url)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
                 }
             }
         };
