@@ -25,7 +25,7 @@
         .config(['ngZconnectedProvider', function(ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
-        .controller('sampleController', ['$q', 'userService', 'authenticationService', 'resourceService', function($q, userService, authenticationService, resourceService) {
+        .controller('sampleController', ['$q', 'userService', 'authenticationService', 'employerService', function($q, userService, authenticationService, employerService) {
             var vm = this;
             $q.when(authenticationService.login({
                     username: 'test9@jobsglobal.com',
@@ -33,12 +33,10 @@
                 }))
                 .then(function(resp) {
                     console.log(resp);
-                    return userService.getCurrentUser();
+                    return employerService.cv.saveToCompany(740, 182, 96506)
                 })
-                .then(function(currentUser) {
-                    console.log(currentUser);
-                    vm.currentUser = currentUser;
-                    vm.moduleUrl = resourceService.modules.getUrlByName('mod_job_post');
+                .then(function(resp) {
+                    console.log(resp);
                 })
                 .catch(function(error) {
                     console.log(error);

@@ -801,10 +801,14 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
         self.cv = {
-            baseUrl: apiRoot + '/employer/:userId/company/:companyId/cv/:cvId',
-            api: $resource(this.baseUrl, { cvId: '@id' }),
+            api: $resource(apiRoot + '/employer/:userId/company/:companyId/cv/:cvId', { cvId: '@id' }, {
+                saveToCompany: {
+                    method: "POST",
+                    url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
+                }
+            }),
             saveToCompany: function(userId, companyId, cvId) {
-                return this.api.save({ userId: userId, companyId: companyId }, { uploadId: cvId });
+                return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId });
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search?limit=' + limit + '&page=' + page;
