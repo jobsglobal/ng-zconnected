@@ -1239,7 +1239,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getUserGroup: function(userId, limit, page) {
                 var deferred = $q.defer();
-                $http.get(apiRoot + '/user/' + userId + '/userevents', {
+                $http.get(apiRoot + '/user/' + userId + '/usergroups', {
                         limit: limit,
                         page: page
                     })
