@@ -322,7 +322,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
             },
             profileViews: function(id, page) {
-                return $resource(Zconnected.apiUrl + '/user/:id/profileView?limit=1&page=:page').get({
+                return $resource(Zconnected.apiUrl + '/user/:id/profileView').get({
                     id: id,
                     page: page
                 }).$promise;
@@ -747,7 +747,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 query: {
                     method: 'GET',
                     isArray: false,
-                    url: apiRoot + '/employer/:userId/company/:companyId/employee?qname=:qname&limit=:limit&page=:page'
+                    url: apiRoot + '/employer/:userId/company/:companyId/employee'
                 },
                 sendInvite: {
                     method: 'POST',
@@ -829,7 +829,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search?limit=' + limit + '&page=' + page;
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
 
                 var str = [];
 
@@ -846,7 +846,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 $http({
                         method: 'GET',
                         url: url,
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        params: {
+                            limit: limit,
+                            page: page
+                        }
                     })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
@@ -967,9 +971,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return {
             api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid"),
             save: function(id, companyid, job) {
-                return $resource(apiRoot + "/employer/:id/company/:companyid/job?social=1").save({
+                return $resource(apiRoot + "/employer/:id/company/:companyid/job").save({
                     id: id,
-                    companyid: companyid
+                    companyid: companyid,
+                    social: 1
                 }, job).$promise;
             },
             get: function(id, companyid, jobid) {
@@ -986,9 +991,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             getMostApplied: function(userId, companyId, $limit, $from, $to) {
                 var deferred = $q.defer();
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
-                if ($limit)
-                    url += '&limit=' + $limit;
-                $http.jsonp(url).then(function(resp) {
+                $http.jsonp(url, {
+                    params: {
+                        limit: limit
+                    }
+                }).then(function(resp) {
                     deferred.resolve(resp.data);
                 }, function(error) {
                     deferred.reject(error);
@@ -996,7 +1003,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.promise;
             },
             applicants: {
-                api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid/applicants?limit=:limit&page=:page", {}, {
+                api: $resource(apiRoot + "/employer/:id/company/:companyid/job/:jobid/applicants", {}, {
                     query: {
                         method: 'GET',
                         isArray: false
@@ -1036,8 +1043,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     limit = limit || 10;
                     page = page || 1;
                     var deferred = $q.defer();
-                    var url = apiRoot + '/jobseeker/' + userId + '/job/applied?limit=' + limit + '&page=' + page;
-                    $http.get(url)
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/applied';
+                    $http.get(url, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
                         .then(function(resp) {
                             deferred.resolve(resp.data);
                         }, function(error) {
@@ -1049,8 +1061,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     limit = limit || 10;
                     page = page || 1;
                     var deferred = $q.defer();
-                    var url = apiRoot + '/jobseeker/' + userId + '/job/saved?limit=' + limit + '&page=' + page;
-                    $http.get(url)
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/saved';
+                    $http.get(url, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
                         .then(function(resp) {
                             deferred.resolve(resp.data);
                         }, function(error) {
@@ -1062,8 +1079,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     limit = limit || 10;
                     page = page || 1;
                     var deferred = $q.defer();
-                    var url = apiRoot + '/jobseeker/' + userId + '/job/recommended?limit=' + limit + '&page=' + page;
-                    $http.get(url)
+                    var url = apiRoot + '/jobseeker/' + userId + '/job/recommended';
+                    $http.get(url, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
                         .then(function(resp) {
                             deferred.resolve(resp.data);
                         }, function(error) {
@@ -1077,8 +1099,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     limit = limit || 10;
                     page = page || 1;
                     var deferred = $q.defer();
-                    var url = apiRoot + '/job/latest?limit=' + limit + '&page=' + page;
-                    $http.get(url)
+                    var url = apiRoot + '/job/latest';
+                    $http.get(url, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
                         .then(function(resp) {
                             deferred.resolve(resp.data);
                         }, function(error) {
@@ -1091,8 +1118,15 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     limit = limit || 10;
                     page = page || 1;
                     var deferred = $q.defer();
-                    var url = apiRoot + '/job/search?search=' + search + '&country=' + country + '&limit=' + limit + '&page=' + page;
-                    $http.get(url)
+                    var url = apiRoot + '/job/search';
+                    $http.get(url, {
+                            params: {
+                                search: search,
+                                country: country,
+                                limit: limit,
+                                page: page
+                            }
+                        })
                         .then(function(resp) {
                             deferred.resolve(resp.data);
                         }, function(error) {
@@ -1124,7 +1158,12 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getUserFriends: function(userId, limit, page) {
                 var deferred = $q.defer();
-                $http.get(apiRoot + '/user/' + userId + '/userfriend?limit=' + limit + '&page=' + page)
+                $http.get(apiRoot + '/user/' + userId + '/userfriend', {
+                        params: {
+                            limit: limit,
+                            page: page
+                        }
+                    })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
@@ -1144,7 +1183,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getCurrentUserSuggestedUsers: function(limit, page) {
                 var deferred = $q.defer();
-                $http.get(apiRoot + '/user/current/suggestedUsers?limit=' + limit + 'page=' + page)
+                $http.get(apiRoot + '/user/current/suggestedUsers', {
+                        limit: limit,
+                        page: page
+                    })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
