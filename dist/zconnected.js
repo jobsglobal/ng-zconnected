@@ -108,7 +108,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
             },
             groupList: {
-                api: $resource(apiRoot + '/group'),
+                api: $resource(apiRoot + '/groups'),
 
                 get: function(limit, page) {
                     return this.api.get({
