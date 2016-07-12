@@ -87,6 +87,36 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return this.api.get().$promise;
                 }
             },
+            events: {
+                api: $resource(apiRoot + '/event'),
+
+                get: function() {
+                    return this.api.get({
+                        limit: limit,
+                        page: page
+                    }).$promise;
+                }
+            },
+            companyList: {
+                api: $resource(apiRoot + '/company/latest'),
+
+                get: function() {
+                    return this.api.get({
+                        limit: limit,
+                        page: page
+                    }).$promise;
+                }
+            },
+            groupList: {
+                api: $resource(apiRoot + '/group'),
+
+                get: function() {
+                    return this.api.get({
+                        limit: limit,
+                        page: page
+                    }).$promise;
+                }
+            },
             companyTypeList: {
                 get: function() {
                     var deferred = $q.defer();
