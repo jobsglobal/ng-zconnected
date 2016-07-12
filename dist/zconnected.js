@@ -1236,6 +1236,19 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error.data);
                     });
                 return deferred.promise;
+            },
+            getUserGroup: function(userId, limit, page) {
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/user/' + userId + '/userevents', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
             }
         };
     }])
