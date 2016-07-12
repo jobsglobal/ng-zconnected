@@ -79,7 +79,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
             },
             events: {
-                api: $resource(apiRoot + '/event'),
+                api: $resource(apiRoot + '/events'),
 
                 get: function(limit, page) {
                     return this.api.get({
