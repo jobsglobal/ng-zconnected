@@ -81,7 +81,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             events: {
                 api: $resource(apiRoot + '/event'),
 
-                get: function() {
+                get: function(limit, page) {
                     return this.api.get({
                         limit: limit,
                         page: page
@@ -91,7 +91,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             companyList: {
                 api: $resource(apiRoot + '/company/latest'),
 
-                get: function() {
+                get: function(limit, page) {
                     return this.api.get({
                         limit: limit,
                         page: page
@@ -101,7 +101,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             groupList: {
                 api: $resource(apiRoot + '/group'),
 
-                get: function() {
+                get: function(limit, page) {
                     return this.api.get({
                         limit: limit,
                         page: page
