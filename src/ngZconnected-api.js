@@ -1009,12 +1009,14 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     data: data
                 });
             },
-            getMostApplied: function(userId, companyId, $limit, $from, $to) {
+            getMostApplied: function(userId, companyId, limit, from, to) {
                 var deferred = $q.defer();
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
                 $http.jsonp(url, {
                     params: {
-                        limit: limit
+                        limit: limit,
+                        from: from,
+                        to: to
                     }
                 }).then(function(resp) {
                     deferred.resolve(resp.data);
