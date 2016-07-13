@@ -1,4 +1,8 @@
-angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
+angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
+    .config(['localStorageServiceProvider', function(localStorageServiceProvider) {
+        /* body... */
+        localStorageServiceProvider.setPrefix('ngZconnected');
+    }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
@@ -14,6 +18,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 get: function(countryid) {
                     return this.api.query({ countryid: countryid }).$promise;
+                    ss
                 }
             },
             cityList: {
@@ -626,7 +631,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
+    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', function employerService($resource, ngZconnected, $http, $q, localStorageService) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -846,6 +851,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
                 }
             }),
+            keywordKey: 'searchKeywords',
             saveToCompany: function(userId, companyId, cvId) {
                 return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
@@ -879,6 +885,16 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error);
                     });
                 return deferred.promise;
+            },
+            storeSearchKeyword: function(keyword) {
+                var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
+                keywords.push(keyword);
+                localStorageService.set(this.keywordKey, angular.toJson(keywords));
+
+            },
+            getSearchHistory: function() {
+                var keywords = angular.fromJson(localStorageService.get(this.keywordKey));
+                return keywords || [];
             },
 
             parseCv: function(fileToUpload) {
