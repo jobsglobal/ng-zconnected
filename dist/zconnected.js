@@ -638,7 +638,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
-        self.api = $resource(apiRoot + '/employer/:userId', null, { getByJobseekerId: { method: 'GET' } });
+        self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
         self.getEmployerProfile = function(userId) {
             return self.api.get({ userId: userId }).$promise;
         };
