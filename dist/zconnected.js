@@ -638,7 +638,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
     .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
-        self.api = $resource(apiRoot + '/employer/:userId', null, { getByJobseekerId: { method: 'GET' } });
+        self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
         self.getEmployerProfile = function(userId) {
             return self.api.get({ userId: userId }).$promise;
         };
@@ -1018,12 +1018,14 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     data: data
                 });
             },
-            getMostApplied: function(userId, companyId, $limit, $from, $to) {
+            getMostApplied: function(userId, companyId, limit, from, to) {
                 var deferred = $q.defer();
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
                 $http.jsonp(url, {
                     params: {
-                        limit: limit
+                        limit: limit,
+                        from: from,
+                        to: to
                     }
                 }).then(function(resp) {
                     deferred.resolve(resp.data);
@@ -2021,6 +2023,6 @@ jQuery.fn.extend({
     }
 });
 
-angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\r\n    <div class=\"sk-circle\">\r\n        <div class=\"sk-circle1 sk-child\"></div>\r\n        <div class=\"sk-circle2 sk-child\"></div>\r\n        <div class=\"sk-circle3 sk-child\"></div>\r\n        <div class=\"sk-circle4 sk-child\"></div>\r\n        <div class=\"sk-circle5 sk-child\"></div>\r\n        <div class=\"sk-circle6 sk-child\"></div>\r\n        <div class=\"sk-circle7 sk-child\"></div>\r\n        <div class=\"sk-circle8 sk-child\"></div>\r\n        <div class=\"sk-circle9 sk-child\"></div>\r\n        <div class=\"sk-circle10 sk-child\"></div>\r\n        <div class=\"sk-circle11 sk-child\"></div>\r\n        <div class=\"sk-circle12 sk-child\"></div>\r\n    </div>\r\n</div>\r\n");
+angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\n    <div class=\"sk-circle\">\n        <div class=\"sk-circle1 sk-child\"></div>\n        <div class=\"sk-circle2 sk-child\"></div>\n        <div class=\"sk-circle3 sk-child\"></div>\n        <div class=\"sk-circle4 sk-child\"></div>\n        <div class=\"sk-circle5 sk-child\"></div>\n        <div class=\"sk-circle6 sk-child\"></div>\n        <div class=\"sk-circle7 sk-child\"></div>\n        <div class=\"sk-circle8 sk-child\"></div>\n        <div class=\"sk-circle9 sk-child\"></div>\n        <div class=\"sk-circle10 sk-child\"></div>\n        <div class=\"sk-circle11 sk-child\"></div>\n        <div class=\"sk-circle12 sk-child\"></div>\n    </div>\n</div>\n");
 $templateCache.put("/templates/ngModal.html","");
-$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\r\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\r\n</ul>\r\n");}]);
+$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\n</ul>\n");}]);
