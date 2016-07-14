@@ -873,10 +873,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         method: 'GET',
                         url: url,
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        params: {
-                            limit: limit,
-                            page: page
-                        }
+                        params: searchCriterias
                     })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
