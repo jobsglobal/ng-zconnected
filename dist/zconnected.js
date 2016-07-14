@@ -640,7 +640,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', function employerService($resource, ngZconnected, $http, $q, localStorageService) {
+    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, $http, $q, localStorageService, $filter) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -897,7 +897,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             storeSearchKeyword: function(keyword) {
                 var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
-                keywords.push(keyword);
+                var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
+                if (existingEntry) {
+                    existingEntry.times++;
+                    existingEntry.timestamp = new Date();
+                } else {
+
+                    keywords.push({
+                        value: keyword,
+                        times: 1,
+                        timestamp: new Date()
+                    });
+                }
                 localStorageService.set(this.keywordKey, angular.toJson(keywords));
 
             },
