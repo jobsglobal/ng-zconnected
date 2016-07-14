@@ -909,6 +909,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         timestamp: new Date()
                     });
                 }
+                keywords = $filter('orderBy')(keywords, 'times', true);
                 localStorageService.set(this.keywordKey, angular.toJson(keywords));
 
             },

@@ -32,9 +32,6 @@
                 }))
                 .then(function(resp) {
                     vm.keywords = employerService.cv.getSearchHistory();
-                    employerService.cv.storeSearchKeyword('test1');
-                    employerService.cv.storeSearchKeyword('test2');
-                    employerService.cv.storeSearchKeyword('test3');
                     employerService.cv.storeSearchKeyword('test4');
                     employerService.cv.storeSearchKeyword('test5');
                     vm.keywords = employerService.cv.getSearchHistory();
