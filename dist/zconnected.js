@@ -866,18 +866,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
-
-                var str = [];
-
-                for (var p in searchCriterias) {
-                    if (searchCriterias.hasOwnProperty(p)) {
-                        if (searchCriterias[p])
-                            str.push(encodeURIComponent(p) + '=' + encodeURIComponent(searchCriterias[p]));
-                    }
-                }
-                url += '&' + str.join("&");
-                if (ngZconnected._DEBUG)
-                    console.log(url);
+                searchCriterias.limit = limit;
+                searchCriterias.page = page;
                 var deferred = $q.defer();
                 $http({
                         method: 'GET',
