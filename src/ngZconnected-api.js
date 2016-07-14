@@ -149,7 +149,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             adList: function() {
                 var deferred = $q.defer();
-                $http.jsonp(apiRoot + '/ads?callback=JSON_CALLBACK').then(function(resp) {
+                $http.get(apiRoot + '/ads').then(function(resp) {
                     deferred.resolve(resp.data);
                 }, function(error) {
                     deferred.reject(error);
@@ -159,7 +159,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             modules: {
                 getAll: getModules = function() {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/module?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/module').then(function(resp) {
                         deferred.resolve(resp.data.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -245,7 +245,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getTimelineHtml: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -257,7 +257,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getJobGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -266,7 +266,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getApplicantGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -1027,8 +1027,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getMostApplied: function(userId, companyId, limit, from, to) {
                 var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
-                $http.jsonp(url, {
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants';
+                $http.get(url, {
                     params: {
                         limit: limit,
                         from: from,
@@ -1059,7 +1059,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -1069,7 +1069,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getCount: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
