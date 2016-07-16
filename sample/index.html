@@ -11,7 +11,7 @@
 <body>
     <div data-ng-app="sample">
         <div data-ng-controller="sampleController as vm">
-            <pre data-ng-bind="vm.keywords | json"></pre>
+            <multiselect-checklist data-items-list="vm.countries" data-display-property="nicename" data-selected-list="vm.selectedCountries"></multiselect-checklist>
         </div>
     </div>
     <!-- bower:js -->
@@ -24,22 +24,32 @@
         .config(['ngZconnectedProvider', function(ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
-        .controller('sampleController', ['$q', 'userService', 'authenticationService', 'employerService', function($q, userService, authenticationService, employerService) {
-            var vm = this;
-            $q.when(authenticationService.login({
-                    username: 'test9@jobsglobal.com',
-                    password: 'User12345'
-                }))
-                .then(function(resp) {
-                    vm.keywords = employerService.cv.getSearchHistory();
-                    employerService.cv.storeSearchKeyword('test4');
-                    employerService.cv.storeSearchKeyword('test5');
-                    vm.keywords = employerService.cv.getSearchHistory();
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-        }]);
+        .controller('sampleController', [
+            '$q',
+            'userService',
+            'authenticationService',
+            'resourceService',
+            '$templateCache',
+            function($q, userService, authenticationService, resourceService, $templateCache) {
+                var vm = this;
+                vm.countries = [];
+                vm.selectedCountries = [];
+                $q.when(authenticationService.login({
+                        username: 'test9@jobsglobal.com',
+                        password: 'User12345'
+                    }))
+                    .then(function(resp) {
+                        return resourceService.countryList.get();
+                    })
+                    .then(function(countries) {
+                        console.log(countries);
+                        vm.countries = countries;
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            }
+        ]);
     </script>
 </body>
 

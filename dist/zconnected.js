@@ -1388,29 +1388,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         };
     }]);
 
-angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
-    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
-        $httpProvider.interceptors.push('authenticationInterceptor');
-        authenticationInterceptorProvider.error(function() {
+angular.module('ngZconnected.directives', ['checklist-model'])
 
-            $logoutElement = angular.element('#logoutLink');
-            if ($logoutElement.length > 0) {
-                window.location.href = $logoutElement.attr('href');
-            }
-        });
-
-    }])
-    .provider('ngZconnected', [function() {
-        var self = this;
-        this.setApiUrl = function(url) {
-            Zconnected.apiUrl = url;
-        };
-        this.$get = [function() {
-            return Zconnected;
-        }];
-        return self;
-    }])
-    .directive('nonZero', function() {
+.directive('nonZero', function() {
         return {
             restrict: 'A',
             require: 'ngModel',
@@ -1573,6 +1553,45 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
             }
         };
     })
+    .directive('multiselectChecklist', function() {
+        return {
+            restrict: 'E',
+            templateUrl: '/src/templates/ngMultiselectChecklist.html',
+            priority: 1001,
+            scope: {
+                itemsList: '=',
+                displayProperty: '@',
+                valueProperty: '@',
+                selectedList: '='
+            },
+            link: function(scope, element, attrs) {
+                console.log(scope.onChange);
+            }
+        }
+    });
+
+angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates', 'ngZconnected.directives'])
+    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+        authenticationInterceptorProvider.error(function() {
+
+            $logoutElement = angular.element('#logoutLink');
+            if ($logoutElement.length > 0) {
+                window.location.href = $logoutElement.attr('href');
+            }
+        });
+
+    }])
+    .provider('ngZconnected', [function() {
+        var self = this;
+        this.setApiUrl = function(url) {
+            Zconnected.apiUrl = url;
+        };
+        this.$get = [function() {
+            return Zconnected;
+        }];
+        return self;
+    }])
     .filter('html', ['$sce', function($sce) {
         return function(text) {
             return $sce.trustAsHtml(text);
@@ -2040,4 +2059,5 @@ jQuery.fn.extend({
 
 angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\n    <div class=\"sk-circle\">\n        <div class=\"sk-circle1 sk-child\"></div>\n        <div class=\"sk-circle2 sk-child\"></div>\n        <div class=\"sk-circle3 sk-child\"></div>\n        <div class=\"sk-circle4 sk-child\"></div>\n        <div class=\"sk-circle5 sk-child\"></div>\n        <div class=\"sk-circle6 sk-child\"></div>\n        <div class=\"sk-circle7 sk-child\"></div>\n        <div class=\"sk-circle8 sk-child\"></div>\n        <div class=\"sk-circle9 sk-child\"></div>\n        <div class=\"sk-circle10 sk-child\"></div>\n        <div class=\"sk-circle11 sk-child\"></div>\n        <div class=\"sk-circle12 sk-child\"></div>\n    </div>\n</div>\n");
 $templateCache.put("/templates/ngModal.html","");
+$templateCache.put("/templates/ngMultiselectChecklist.html","<div class=\"checklist-container\">\n    <ul class=\"checkbox-list\">\n        <li data-ng-repeat=\"item in itemsList\">\n            <input type=\"checkbox\" data-checklist-model=\"selectedList\" data-checklist-value=\"item[displayProperty]\">\n            <p>{{item[displayProperty]}}</p>\n        </li>\n    </ul>\n</div>\n");
 $templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\n</ul>\n");}]);

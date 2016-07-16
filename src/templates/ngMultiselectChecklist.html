@@ -1,0 +1,8 @@
+<div class="checklist-container">
+    <ul class="checkbox-list">
+        <li data-ng-repeat="item in itemsList">
+            <input type="checkbox" data-checklist-model="selectedList" data-checklist-value="item[displayProperty]">
+            <p>{{item[displayProperty]}}</p>
+        </li>
+    </ul>
+</div>
