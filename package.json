@@ -29,6 +29,5 @@
         "karma-jasmine": "^0.3.8",
         "wiredep": "^4.0.0"
     },
-    "dependencies": {},
-    "main": ["dist/ng-zconnected.css", "dist/ng-zconnected.js"]
+    "dependencies": {}
 }
