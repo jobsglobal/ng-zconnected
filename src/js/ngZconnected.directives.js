@@ -172,7 +172,8 @@ angular.module('ngZconnected.directives', ['checklist-model'])
                 itemsList: '=',
                 displayProperty: '@',
                 valueProperty: '@',
-                selectedList: '='
+                selectedList: '=',
+                containerHeight: '@'
             },
             link: function(scope, element, attrs) {
                 console.log(scope.onChange);

@@ -1,9 +1,23 @@
 <div class="checklist-container">
     <input type="text" class="cv_search_subinput">
-    <ul class="checkbox-list">
+    <ul class="checkbox-list" style="height: {{containerHeight}}px">
         <li data-ng-repeat="item in itemsList">
             <input type="checkbox" data-checklist-model="selectedList" data-checklist-value="item[displayProperty]">
             <p>{{item[displayProperty]}}</p>
+            <ul class="checkbox-sublist">
+                <li>
+                    <input type="checkbox">
+                    <p>Sample text</p>
+                </li>
+                <li>
+                    <input type="checkbox">
+                    <p>Sample text</p>
+                </li>
+                <li>
+                    <input type="checkbox">
+                    <p>Sample text</p>
+                </li>
+            </ul>
         </li>
     </ul>
 </div>

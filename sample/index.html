@@ -11,7 +11,11 @@
 <body>
     <div data-ng-app="sample">
         <div data-ng-controller="sampleController as vm">
-            <multiselect-checklist data-items-list="vm.countries" data-display-property="nicename" data-selected-list="vm.selectedCountries"></multiselect-checklist>
+            <ul>
+                <li>
+                    <multiselect-checklist data-items-list="vm.countries" data-display-property="nicename" data-selected-list="vm.selectedCountries" container-height="150"></multiselect-checklist>
+                </li>
+            </ul>
         </div>
     </div>
     <!-- bower:js -->
