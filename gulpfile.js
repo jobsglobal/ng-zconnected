@@ -61,7 +61,6 @@ gulp.task('js', function() {
         .pipe(angularFilesort())
         .pipe(_if('*.js', replace(/'use strict';/g, '')))
         .pipe(concat(pkg.name + '.js'))
-        .pipe(headerfooter('(function(window, undefined) {\'use strict\';\n', '})(window);'))
         .pipe(ngAnnotate(annotateOptions))
         .pipe(gulp.dest('dist'))
         .pipe(rename(pkg.name + '.min.js'))

@@ -1,4 +1,3 @@
-(function(window, undefined) {'use strict';
 angular.module("ngZconnected.templates", []).run(['$templateCache', function($templateCache) {$templateCache.put("/templates/templates/ngLoader.html","<div class=zloader><div class=sk-circle><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>");
 $templateCache.put("/templates/templates/ngModal.html","");
 $templateCache.put("/templates/templates/ngMultiselectChecklist.html","<div class=checklist-container><ul class=checkbox-list><li data-ng-repeat=\"item in itemsList\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=item[displayProperty]><p>{{item[displayProperty]}}</p></li></ul></div>");
@@ -2061,4 +2060,4 @@ angular.module('ngJoms', [])
         //    throw new Error('joms.js not loaded.');
         //}
         return joms;
-    });})(window);
+    });
