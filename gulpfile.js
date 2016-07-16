@@ -42,7 +42,7 @@ gulp.task('sample', function() {
 });
 var templateOptions = {
     root: '/templates',
-    module: pkg.name + '.templates',
+    module: 'ngZconnected.templates',
     standalone: true
 };
 gulp.task('compile', ['css', 'js']);
