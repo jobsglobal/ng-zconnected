@@ -72,7 +72,7 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('watch', function() {
-    gulp.watch(['src/**'], ['sample']);
+    gulp.watch(['src/**'], ['compile', 'sample']);
 });
 gulp.task('serve', ['compile', 'sample', 'watch'], function() {
     connect.server({
