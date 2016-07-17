@@ -1,0 +1,4 @@
+<li data-ng-repeat="subItem in sublist | filter: filterChecklist(filterKey)">
+    <input type="checkbox" data-checklist-model="selectedList" data-checklist-value="subItem[sublistDisplayProperty]">
+    <p>{{subItem[sublistDisplayProperty]}}</p>
+</li>

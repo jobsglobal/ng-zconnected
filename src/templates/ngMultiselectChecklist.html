@@ -4,20 +4,8 @@
         <li data-ng-repeat="item in itemsList | filter: filterChecklist(filterKey)">
             <input type="checkbox" data-checklist-model="selectedList" data-checklist-value="item[displayProperty]">
             <p>{{item[displayProperty]}}</p>
+            <ul class="checkbox-sublist" data-ng-transclude>
+            </ul>
         </li>
     </ul>
 </div>
-<!--<ul class="checkbox-sublist">
-    <li>
-        <input type="checkbox">
-        <p>Sample text</p>
-    </li>
-    <li>
-        <input type="checkbox">
-        <p>Sample text</p>
-    </li>
-    <li>
-        <input type="checkbox">
-        <p>Sample text</p>
-    </li>
-</ul>-->

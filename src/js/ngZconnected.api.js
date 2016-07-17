@@ -147,6 +147,39 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 }
             },
+            experienceYearList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/experienceYear').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            salaryRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/salaryRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            educationalLevelList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/educationalLevel').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
             adList: function() {
                 var deferred = $q.defer();
                 $http.get(apiRoot + '/ads').then(function(resp) {

@@ -168,12 +168,14 @@ angular.module('ngZconnected.directives', ['checklist-model'])
             restrict: 'E',
             templateUrl: '/templates/ngMultiselectChecklist.html',
             priority: 1001,
+            transclude: true,
             scope: {
                 itemsList: '=',
                 displayProperty: '@',
                 valueProperty: '@',
                 selectedList: '=',
                 containerHeight: '@',
+                onChanged: '&'
             },
             controller: ['$scope', function($scope) {
                 $scope.filterChecklist = function(filter) {
@@ -182,6 +184,25 @@ angular.module('ngZconnected.directives', ['checklist-model'])
                     }
                 }
             }],
-            link: function(scope, element, attrs) {}
+            link: function(scope, element, attrs) {
+
+            }
         }
-    });
+    })
+    .directive('subChecklist', [function() {
+        return {
+            restrict: 'E',
+            require: '^multiselectChecklist',
+            templateUrl: '/templates/ngChecklistSublist.html',
+            transclude: true,
+            scope: {
+                propertList: '@',
+                displayProperty: '@',
+                valueProperty: '@',
+
+            },
+            link: function(scope, element, attrs, multiselectChecklistCtrl) {
+                console.log(scope);
+            }
+        };
+    }]);
