@@ -923,6 +923,154 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.$promise;
             }
         };
+        self.smsCampaign = {
+            api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                update: {
+                    method: 'PUT'
+                }
+            }),
+            get: function(userId, companyId, smscampaignid) {
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            save: function(userId, companyId){
+                if (smscampaign.hasOwnProperty('id')) {
+                    return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                } else {
+                    return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                }
+            },
+            getCampaign: function(userId, companyId, limit, page) {
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            runCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid  + '/runcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            stopCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/stopcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            deleteCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/deletecampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            recipient: {
+                api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    }
+                }),
+                update: function(){
+                    return this.api.save({ userId: userId, companyId: companyId, smscampaignid: smscampaignid}, recipient).$promise;
+                },
+                getRecipient: function(userId, companyId, smscampaignid){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                getRecipientById: function(userId, companyId, smscampaignid, recipientId){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                processRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/process', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unProcessRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unprocess', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                sendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/send', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unSendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unsend', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                }
+            }
+        };
     }])
     .service('smsService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
         var self = this;
@@ -2023,6 +2171,6 @@ jQuery.fn.extend({
     }
 });
 
-angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\n    <div class=\"sk-circle\">\n        <div class=\"sk-circle1 sk-child\"></div>\n        <div class=\"sk-circle2 sk-child\"></div>\n        <div class=\"sk-circle3 sk-child\"></div>\n        <div class=\"sk-circle4 sk-child\"></div>\n        <div class=\"sk-circle5 sk-child\"></div>\n        <div class=\"sk-circle6 sk-child\"></div>\n        <div class=\"sk-circle7 sk-child\"></div>\n        <div class=\"sk-circle8 sk-child\"></div>\n        <div class=\"sk-circle9 sk-child\"></div>\n        <div class=\"sk-circle10 sk-child\"></div>\n        <div class=\"sk-circle11 sk-child\"></div>\n        <div class=\"sk-circle12 sk-child\"></div>\n    </div>\n</div>\n");
+angular.module("ngZconnected.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("/templates/ngLoader.html","<div class=\"zloader\">\r\n    <div class=\"sk-circle\">\r\n        <div class=\"sk-circle1 sk-child\"></div>\r\n        <div class=\"sk-circle2 sk-child\"></div>\r\n        <div class=\"sk-circle3 sk-child\"></div>\r\n        <div class=\"sk-circle4 sk-child\"></div>\r\n        <div class=\"sk-circle5 sk-child\"></div>\r\n        <div class=\"sk-circle6 sk-child\"></div>\r\n        <div class=\"sk-circle7 sk-child\"></div>\r\n        <div class=\"sk-circle8 sk-child\"></div>\r\n        <div class=\"sk-circle9 sk-child\"></div>\r\n        <div class=\"sk-circle10 sk-child\"></div>\r\n        <div class=\"sk-circle11 sk-child\"></div>\r\n        <div class=\"sk-circle12 sk-child\"></div>\r\n    </div>\r\n</div>\r\n");
 $templateCache.put("/templates/ngModal.html","");
-$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\n</ul>\n");}]);
+$templateCache.put("/templates/ngPagination.html","<ul class=\"pagination\">\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-first\"><a href ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=\"pagination-prev\"><a href ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li>\r\n    <li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=\"pagination-page\"><a href ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li>\r\n    <li ng-if=\"::directionLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-next\"><a href ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li>\r\n    <li ng-if=\"::boundaryLinks\" ng-class=\"{disabled: noNext()||ngDisabled}\" class=\"pagination-last\"><a href ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li>\r\n</ul>\r\n");}]);
