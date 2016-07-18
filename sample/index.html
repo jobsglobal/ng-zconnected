@@ -11,8 +11,14 @@
 <body>
     <div data-ng-app="sample">
         <div data-ng-controller="sampleController as vm">
-            <pre data-ng-bind="vm.currentUser | json"></pre>
-            <iframe data-ng-src="{{vm.moduleUrl}}"></iframe>
+            <ul>
+                <li>
+                    <div class="col-lg-3">
+                        <multiselect-checklist data-items-list="vm.countries" data-display-property="nicename" data-value-property="nicename" data-selected-list="vm.selectedCountries" container-height="150">
+                        </multiselect-checklist>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
     <!-- bower:js -->
@@ -25,23 +31,45 @@
         .config(['ngZconnectedProvider', function(ngZconnectedProvider) {
             ngZconnectedProvider.setApiUrl('//jobsglobal.dev/api/v1')
         }])
-        .controller('sampleController', ['$q', 'userService', 'authenticationService', 'employerService', function($q, userService, authenticationService, employerService) {
-            var vm = this;
-            $q.when(authenticationService.login({
-                    username: 'test9@jobsglobal.com',
-                    password: 'User12345'
-                }))
-                .then(function(resp) {
-                    console.log(resp);
-                    return employerService.cv.saveToCompany(740, 182, 96506)
-                })
-                .then(function(resp) {
-                    console.log(resp);
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
-        }]);
+        .controller('sampleController', [
+            '$q',
+            'userService',
+            'authenticationService',
+            'resourceService',
+            '$templateCache',
+            function($q, userService, authenticationService, resourceService, $templateCache) {
+                var vm = this;
+                vm.countries = [];
+                vm.selectedCountries = [];
+                $q.when(authenticationService.login({
+                        username: 'test9@jobsglobal.com',
+                        password: 'User12345'
+                    }))
+                    .then(function(resp) {
+                        return resourceService.countryList.get();
+                    })
+                    .then(function(countries) {
+                        console.log(countries);
+                        vm.countries = countries;
+                        angular.forEach(vm.countries, function(item) {
+                            item.sub = [{
+                                flag: "/media/com_zconjobs/img/flags/16x16/af.png",
+                                id: 1,
+                                iso: "AF",
+                                iso3: "AFG",
+                                name: "AFGHANISTAN",
+                                nationality: "Afghan",
+                                nicename: "Afghanistan",
+                                numcode: "4",
+                                phonecode: 93
+                            }]
+                        })
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            }
+        ]);
     </script>
 </body>
 

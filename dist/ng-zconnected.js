@@ -1,4 +1,709 @@
-angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
+angular.module("ngZconnected.templates", []).run(['$templateCache', function($templateCache) {$templateCache.put("/templates/ngChecklistSublist.html","<li data-ng-repeat=\"subItem in sublist | filter: filterChecklist(filterKey)\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=subItem[sublistDisplayProperty]><p>{{subItem[sublistDisplayProperty]}}</p></li>");
+$templateCache.put("/templates/ngLoader.html","<div class=zloader><div class=sk-circle><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>");
+$templateCache.put("/templates/ngModal.html","");
+$templateCache.put("/templates/ngMultiselectChecklist.html","<div class=checklist-container><input type=text class=cv_search_subinput ng-model=filterKey><ul class=checkbox-list style=\"height: {{containerHeight}}px\"><li data-ng-repeat=\"item in itemsList | filter: filterChecklist(filterKey)\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=item[displayProperty]><p>{{item[displayProperty]}}</p><ul class=checkbox-sublist data-ng-transclude></ul></li></ul></div>");
+$templateCache.put("/templates/ngPagination.html","<ul class=pagination><li ng-if=::boundaryLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-first><a ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-prev><a ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li><li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=pagination-page><a ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-next><a ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li><li ng-if=::boundaryLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-last><a ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li></ul>");}]);
+var Zconnected = (function($) {
+    var _DEBUG = true;
+    //The following configuration is only for sublime debugging.
+    var debuggerSettings = {
+        ide: 1, //0 = Sublime, 1= Eclipse
+        //debug configuration for sublime
+        XDEBUG_SESSION_START: "XDEBUG_SESSION_START",
+        //debug configuration for eclipse
+        XDEBUG_SESSION_STOP_NO_EXEC: "XDEBUG_SESSION_STOP_NO_EXEC",
+        XDEBUG_SESSION_KEY: "KEY"
+
+    };
+
+    var _baseUrl = $('base').attr('href') + 'index.php';
+    //Global variables
+    //Utility module
+    var helpers = {
+        createUrl: createUrl,
+        attachParamterToUrl: attachParamterToUrl,
+        isFunction: isFunction,
+        showValidationError: showValidationError,
+        hideValidationError: hideValidationError,
+        clearAllValidationError: clearAllValidationError,
+        showLoader: showLoader,
+        hideLoader: hideLoader,
+        animateTextChange: animateTextChange,
+        hideHeader: hideHeader,
+        setCustomBackground: setCustomBackground,
+        removeCustomBackground: removeCustomBackground,
+        toggleSidebarVisibility: toggleSidebarVisibility,
+        showSystemMessage: showSystemMessage,
+        ucfirst: ucfirst
+
+    };
+    return {
+        init: init,
+        helpers: helpers,
+        apiUrl: "/api/v1",
+        _DEBUG: _DEBUG,
+        websiteName: "Jobsglobal"
+    };
+
+    function init() {
+        if (_DEBUG) {
+
+        }
+        var $customFooter = $('.custom-footer');
+        if ($customFooter.length) {
+            var $domainName = $customFooter.find('.domain-name');
+            if ($domainName.length) {
+                if (Zconnected.websiteName == 'jobsglobal') {
+                    $domainName.text(Zconnected.helpers.ucfirst('Zconnected.com'));
+                } else {
+                    $domainName.text(Zconnected.helpers.ucfirst('Jobsglobal.com'));
+
+                }
+            }
+        }
+        var $submenu = $(".sub-menu");
+        if ($submenu.length == 0) {
+            var $section = $("section:not([class])");
+            if ($section.length)
+                $section.addClass('section-without-submenu');
+
+
+        }
+        var $logoutMenu = $('#menu677');
+        if ($logoutMenu.length) {
+
+            $logoutMenu.on('click', function(e) {
+                e.preventDefault();
+                window.location.href = $('#logoutLink').attr('href');
+            });
+        }
+
+        var $menuProfile = $('.zconjobs-menu-profile');
+        if ($menuProfile.length) {
+            $menuProfile.hide();
+            $('body').on('click', 'a', function(event) {
+                var $a = $(this);
+                var url = $a.attr('href');
+                if (url && url.charAt(0) != '#') {
+                    url = attachDebuggerSettingsToUrl(url);
+                    $a.attr('href', url);
+                }
+                /* Act on the event */
+            });
+        }
+
+        var $systemMessage = $('#system-message');
+        if ($systemMessage.length) {
+            $('#system-message').on("DOMNodeInserted", function() {
+                hideSystemMessage();
+            });
+            if ($('#system-message').html().length > 0) {
+                hideSystemMessage();
+            }
+
+        }
+
+        var $generalNotification = $('.hidden_modules .joms-notifications .joms-js--notiflabel-general');
+        if ($generalNotification.length && $generalNotification.html() != 0) {
+            var $generalNotificationMenu = $('#menu639');
+            if ($generalNotificationMenu.length) {
+                $generalNotificationMenu.append('<span class="badge">' + $generalNotification.html() + '</span>');
+            }
+        }
+        var $friendNotification = $('.hidden_modules .joms-notifications .joms-js--notiflabel-frequest');
+        if ($friendNotification.length && $friendNotification.html() != 0) {
+            var $friendNotificationMenu = $('#menu637');
+            if ($friendNotificationMenu.length) {
+                $friendNotificationMenu.append('<span class="badge">' + $friendNotification.html() + '</span>');
+            }
+        }
+        var $pmNotification = $('.hidden_modules .joms-notifications .joms-js--notiflabel-inbox');
+        if ($pmNotification.length && $pmNotification.html() != 0) {
+            var $pmNotificationMenu = $('#menu638');
+            if ($pmNotificationMenu.length) {
+                $pmNotificationMenu.append('<span class="badge">' + $pmNotification.html() + '</span>');
+            }
+        }
+
+    }
+
+    function hideSystemMessage() {
+        var $this = $('#system-message');
+        window.setTimeout(function() {
+            $this.slideUp(1000, function() {
+                $this.html('');
+                $this.show();
+            });
+        }, 2000);
+    }
+
+    function showSystemMessage(message, type) {
+        var $systemMessage = $('#system-message');
+        var template = '<div class="alert alert-' + type + '"><a class="close" data-dismiss="alert" href="#">×</a>' +
+            '<div>' +
+            '<p class="message">' + message + '</p>' +
+            '</div>' +
+            '</div>';
+        $systemMessage.html(template);
+    }
+
+    //Utility methods
+    function setCustomBackground(customClass) {
+        customClass = customClass || 'register_bg';
+        $('body').addClass(customClass);
+        $('.jomsocial').css({
+            backgroundColor: 'transparent'
+        });
+    }
+
+    function removeCustomBackground(customClass) {
+        customClass = customClass || 'register_bg';
+        $('body').removeClass(customClass);
+        $('.jomsocial').css({
+            backgroundColor: '#ecf0f1'
+        });
+    }
+
+    function toggleSidebarVisibility(isVisible) {
+        if (isVisible == null) {
+            $("#sidebar-2").toggle('show');
+        } else {
+            if (isVisible) {
+                $("#sidebar-2").show();
+            } else {
+                $("#sidebar-2").hide();
+            }
+        }
+
+    }
+
+    //
+    function hideHeader() {
+        //$('#main').prepend('<style type="text/css">header{display:none;}#footer{display:none;}section{padding-top:20px;}</style>');
+
+    }
+
+    /**
+     * Function to show a loader above a given element.
+     *
+     * @param   {String}  selector  Selector of the element.
+     *
+     */
+    function showLoader(selector) {
+        if (!selector) {
+            if (_DEBUG) {
+                console.error("Please specify selector of the element to put the loader.");
+            }
+            return false;
+        }
+        //get the element
+        var $element = $(selector);
+        if ($element.length == 0) {
+            if (_DEBUG) {
+                console.error("Please specify a valid selector.");
+            }
+            return false;
+        }
+        var $existingLoader = $(selector).siblings('.spinner-wrapper');
+        if ($existingLoader.length === 0) { //create the loader element
+            var $loader = $('<div class="spinner-wrapper">' +
+                '<div class="spinner">' +
+                '<div class="bounce1"></div>' +
+                '<div class="bounce2"></div>' +
+                '<div class="bounce3"></div>' +
+                '</div>' +
+                '</div>');
+            //insert the loader above the element
+            $loader.insertBefore($element);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Function to hide a loader near a given element.
+     * if an element selector is not provided all loader will be remove
+     *
+     * @param   {String}  selector  Selector of the element.
+     */
+    function hideLoader(selector) {
+        if (selector) {
+            var $loader = $(selector).siblings('.spinner-wrapper');
+            $loader.fadeOut('400', function() {
+                $(this).remove();
+            });
+        } else {
+            var $loaders = $('.spinner-wrapper');
+            $loaders.fadeOut('400', function() {
+                $(this).remove();
+            });
+        }
+    }
+
+    function animateTextChange(elementSelector, text) {
+        var $elementSelector = $(elementSelector);
+        $elementSelector.animate({ opacity: '0' }, "fast");
+        $elementSelector.queue(function() {
+            $elementSelector.html(text);
+            $elementSelector.dequeue(); // This is necessary to continue the animation
+        });
+        $elementSelector.animate({ opacity: '1' }, "fast");
+    }
+
+    /**
+     * Function to show a validation error below an element
+     *
+     * @param   {String}  elementSelector  id or class of the element
+     * @param   {String}  message          The message to show.
+     * @param   {Boolean}  animate         If showing the message will be animated.
+     *
+     * @return  {Boolean}                  If showing of validation error succeeded.
+     */
+    function showValidationError(elementSelector, message, animate, before, autohide) {
+        if (!elementSelector) {
+            if (_DEBUG) {
+                console.error("Selector must not be null.");
+            }
+            return false;
+        }
+        if (!message) {
+            if (_DEBUG) {
+                console.error("Please provide a message to show.");
+            }
+            return false;
+        }
+        //get the element
+        var $element = $(elementSelector);
+        if (!$element.length) {
+            if (_DEBUG) {
+                console.error("Please provide a valid selector.");
+            }
+            return false;
+        }
+        //detect if element already has validation error message shown
+        var $error = $element.siblings(".zconnected-error[data-error-for='" + elementSelector + "']");
+        if ($error.length <= 0) {
+            //create an error element
+            $error = $('<p class="zconnected-error text-left has-error"></p>');
+            //append the error next to the element
+            if (before) {
+                $error.insertBefore($element);
+            } else {
+                $error.insertAfter($element);
+            }
+            //set the data-error-for attribute of element to the elementSelector for future reference
+            $error.attr('data-error-for', elementSelector);
+        }
+        if (animate) {
+            Zconnected.helpers.animateTextChange($(".zconnected-error[data-error-for='" + elementSelector + "']"), message);
+        } else {
+            //set the error message to the error element
+            $error.text(message);
+        }
+        return true;
+    }
+
+    /**
+     * Function to hide a specific error message
+     *
+     * @param   {String}  elementSelector  The id or class of the element
+     * @param   {Boolean}  animate         If showing the message will be animated.
+     *
+     * @return  {Boolean}                   If hiding the error message succeeded.
+     */
+    function hideValidationError(elementSelector, animate) {
+        if (!elementSelector) {
+            if (_DEBUG) {
+                console.err("Selector must not be null.");
+                return false;
+            }
+        }
+        //get the element
+        var $error = $(".zconnected-error[data-error-for='" + elementSelector + "']");
+        //check if animated
+        if (animate) {
+            //hide the element
+            $error.fadeOut('400', function() {
+                $error.remove();
+            });
+        } else {
+            $error.remove();
+        }
+    }
+
+    function clearAllValidationError(animate) {
+        //get all the validation errors
+        var $validationErrors = $('.zconnected-error');
+        $validationErrors.each(function(index, element) {
+            hideValidationError($(element).attr('data-error-for'), animate);
+        });
+    }
+
+    /**
+     * Helper method to create a valid joomla url.
+     * TODO: Add attachment of authentication token to url.
+     *
+     * @param   {String}  url  The joomla url i.e. ?option=com_profile&task=profile.testMethod
+     *
+     * @return  {[type]}       [description]
+     */
+    function createUrl(url) {
+        if (url) {
+            url = _baseUrl + url;
+            if (_DEBUG) {
+                url = attachDebuggerSettingsToUrl(url);
+                console.log('Created url is :', url);
+                return url;
+            }
+        } else {
+            console.error("Please specify a valid url.");
+            return;
+        }
+    }
+
+    /**
+     * Function to detect if a given variable is a function
+     *
+     * @param   {any}   functionToCheck  the variable to check
+     *
+     * @return  {Boolean}                true if the given variable is a function, otherwise false.
+     */
+    function isFunction(functionToCheck) {
+        var getType = {};
+        return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+    }
+
+    function attachDebuggerSettingsToUrl(url) {
+        var xdebugSessionStart = getUrlParameter(debuggerSettings.XDEBUG_SESSION_START);
+        if (xdebugSessionStart) {
+            url = attachParamterToUrl(url, debuggerSettings.XDEBUG_SESSION_START, xdebugSessionStart);
+        }
+        var xdebugSessionStopNoExec = getUrlParameter(debuggerSettings.XDEBUG_SESSION_STOP_NO_EXEC);
+        if (xdebugSessionStopNoExec) {
+            url = attachParamterToUrl(url, debuggerSettings.XDEBUG_SESSION_STOP_NO_EXEC, xdebugSessionStopNoExec);
+        }
+        var xdebugSessionKey = getUrlParameter(debuggerSettings.XDEBUG_SESSION_KEY);
+        if (xdebugSessionKey) {
+            url = attachParamterToUrl(url, debuggerSettings.XDEBUG_SESSION_KEY, xdebugSessionKey);
+        }
+        return url;
+    }
+
+    /**
+     * Helper method to attach a parameter to url.
+     *
+     * @param   {String}  key    The name of the parameter
+     * @param   {Any}     value  The value of the parameter
+     *
+     * @return  {String}         The proccessed url
+     */
+    function attachParamterToUrl(search, key, val) {
+        var newParam = key + '=' + val,
+            params = '?' + newParam;
+        // If the "search" string exists, then build params from it
+        if (search) {
+            // Try to replace an existance instance
+            params = search.replace(new RegExp('[\?&]' + key + '[^&]*'), '$1' + newParam);
+            // If nothing was replaced, then add the new param to the end
+            if (params === search) {
+                params += '&' + newParam;
+            }
+        }
+        return params;
+    }
+
+    function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    }
+
+    function ucfirst(str) {
+        return typeof str != "undefined" ? (str += '', str[0].toUpperCase() + str.substr(1)) : '';
+    }
+})(jQuery);
+jQuery(Zconnected.init);
+
+jQuery.fn.extend({
+    getPath: function() {
+        var path, node = this;
+        while (node.length) {
+            var realNode = node[0],
+                name = realNode.localName;
+            if (!name) break;
+            name = name.toLowerCase();
+
+            var parent = node.parent();
+
+            var sameTagSiblings = parent.children(name);
+            if (sameTagSiblings.length > 1) {
+                allSiblings = parent.children();
+                var index = allSiblings.index(realNode) + 1;
+                if (index > 1) {
+                    name += ':nth-child(' + index + ')';
+                }
+            }
+
+            path = name + (path ? '>' + path : '');
+            node = parent;
+        }
+
+        return path;
+    }
+});
+
+angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates', 'ngZconnected.directives'])
+    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
+        $httpProvider.interceptors.push('authenticationInterceptor');
+        authenticationInterceptorProvider.error(function() {
+
+            $logoutElement = angular.element('#logoutLink');
+            if ($logoutElement.length > 0) {
+                window.location.href = $logoutElement.attr('href');
+            }
+        });
+
+    }])
+    .provider('ngZconnected', function() {
+        var self = this;
+        this.setApiUrl = function(url) {
+            Zconnected.apiUrl = url;
+        };
+        this.$get = function() {
+            return Zconnected;
+        };
+        return self;
+    })
+    .filter('html', ['$sce', function($sce) {
+        return function(text) {
+            return $sce.trustAsHtml(text);
+        };
+    }]);
+
+angular.module('ngZconnected.directives', ['checklist-model'])
+
+.directive('nonZero', function() {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            scope: {
+                nonZero: '='
+            },
+            link: function(scope, element, attribs, ctrl) {
+                function validateNonZero(value) {
+                    var valid = value > 0;
+                    ctrl.$setValidity('nonZero', valid);
+                    return valid ? value : undefined;
+                }
+
+                if (scope.nonZero) {
+                    ctrl.$parsers.unshift(validateNonZero);
+                    validateNonZero(ctrl.$modelValue);
+                }
+
+            }
+        };
+    })
+    .directive('selectOnClick', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, element) {
+                var focusedElement;
+                element.on('focus', function() {
+                    if (focusedElement != this) {
+                        this.select();
+                        focusedElement = this;
+                    }
+                });
+                element.on('blur', function() {
+                    focusedElement = null;
+                });
+            }
+        };
+    })
+    .directive('form', function() {
+        return {
+            require: 'form',
+            restrict: 'E',
+            link: function(scope, elem, attrs, form) {
+                form.$submit = function() {
+                    form.$setSubmitted();
+                    scope.$eval(attrs.ngSubmit);
+                };
+            }
+        };
+    })
+    .directive('zloader', function() {
+        return {
+            restrict: 'E',
+            templateUrl: '/templates/ngLoader.html'
+        };
+    })
+    .directive('dateConverter', function() {
+        return {
+            priority: 1,
+            restrict: 'A',
+            require: 'ngModel',
+            link: function(scope, element, attr, ngModel) {
+                function toModel(value) {
+                    return angular.element.formatDateTime('yy-mm-dd', value); // convert to string
+                }
+
+                function toView(value) {
+                    return new Date(value); // convert to date
+                }
+
+                ngModel.$formatters.push(toView);
+                ngModel.$parsers.push(toModel);
+            }
+        };
+    })
+    .directive('numberConverter', function() {
+        return {
+            priority: 1,
+            restrict: 'A',
+            require: 'ngModel',
+            link: function(scope, element, attr, ngModel) {
+                function toModel(value) {
+                    return "" + value; // convert to string
+                }
+
+                function toView(value) {
+                    return parseInt(value); // convert to number
+                }
+
+                ngModel.$formatters.push(toView);
+                ngModel.$parsers.push(toModel);
+            }
+        };
+    })
+    .directive('showProfileAs', function() {
+        return {
+            priority: 1,
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                element.dropit({
+                    action: 'mouseenter'
+                });
+            }
+        }
+    })
+    .directive('dropIt', function() {
+        return {
+            priority: 1,
+            restrict: 'EA',
+            require: 'ngModel',
+            scope: {
+                dpChange: "&dpChange"
+            },
+
+            link: function(scope, element, attrs, ngModel) {
+
+                var checkBox = '<i class="fa fa-check pull-right privacy-check-selected"></i>';
+                element.dropit({
+                    action: 'mouseenter'
+                });
+                var $lis = element.find('li>ul>li');
+                $lis.on('click', function() {
+                    var $li = angular.element(this);
+                    var ngValue = $li.data('ng-value');
+                    ngModel.$setViewValue(ngValue);
+                    ngModel.$render();
+                    if (angular.isFunction(scope.dpChange)) {
+                        scope.dpChange();
+                    }
+                });
+                ngModel.$render = function() {
+
+                    element.dropit({
+                        action: 'mouseenter'
+                    });
+                    element.find('.privacy-check-selected').remove();
+                    var $selectedLi = element.find("li>ul>li[data-ng-value='" + ngModel.$modelValue + "']");
+                    $selectedLi.find('a').append(checkBox);
+                }
+            }
+
+        };
+    })
+    .directive('scrollToError', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elem) {
+
+                // set up event handler on the form element
+                elem.on('submit', function() {
+
+                    // find the first invalid element
+                    var firstInvalid = elem[0].querySelector('.ng-invalid');
+
+                    // if we find one, set focus
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+                });
+            }
+        };
+    })
+    .directive('multiselectChecklist', function() {
+        return {
+            restrict: 'E',
+            templateUrl: '/templates/ngMultiselectChecklist.html',
+            priority: 1001,
+            transclude: true,
+            scope: {
+                itemsList: '=',
+                displayProperty: '@',
+                valueProperty: '@',
+                selectedList: '=',
+                containerHeight: '@',
+                onChanged: '&'
+            },
+            controller: ['$scope', function($scope) {
+                $scope.filterChecklist = function(filter) {
+                    return function(item) {
+                        return (item[$scope.valueProperty].toLowerCase().indexOf(filter) > -1) || (!filter) || (!filter.length);
+                    }
+                }
+            }],
+            link: function(scope, element, attrs) {
+
+            }
+        }
+    })
+    .directive('subChecklist', function() {
+        return {
+            restrict: 'E',
+            require: '^multiselectChecklist',
+            templateUrl: '/templates/ngChecklistSublist.html',
+            transclude: true,
+            scope: {
+                propertList: '@',
+                displayProperty: '@',
+                valueProperty: '@',
+
+            },
+            link: function(scope, element, attrs, multiselectChecklistCtrl) {
+                console.log(scope);
+            }
+        };
+    });
+
+angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
+    .config(['localStorageServiceProvider', function(localStorageServiceProvider) {
+        /* body... */
+        localStorageServiceProvider.setPrefix('ngZconnected');
+    }])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
@@ -14,6 +719,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 get: function(countryid) {
                     return this.api.query({ countryid: countryid }).$promise;
+                    ss
                 }
             },
             cityList: {
@@ -142,9 +848,42 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 }
             },
+            experienceYearList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/experienceYear').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            salaryRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/salaryRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            educationalLevelList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/educationalLevel').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
             adList: function() {
                 var deferred = $q.defer();
-                $http.jsonp(apiRoot + '/ads?callback=JSON_CALLBACK').then(function(resp) {
+                $http.get(apiRoot + '/ads').then(function(resp) {
                     deferred.resolve(resp.data);
                 }, function(error) {
                     deferred.reject(error);
@@ -152,9 +891,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.promise;
             },
             modules: {
-                getAll: getModules = function() {
+                getAll: function() {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/module?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/module').then(function(resp) {
                         deferred.resolve(resp.data.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -183,11 +922,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return api;
     }])
     .factory('companyService', ['$resource', '$http', '$q', 'Upload', 'ngZconnected', function($resource, $http, $q, Upload, ngZconnected) {
-        'use strict';
+        
 
         // Detect if an API backend is present. If so, return the API module, else
         // hand off the localStorage adapter
-        'use strict';
+        
         var apiRoot = ngZconnected.apiUrl;
         var store = {
             company: {
@@ -240,7 +979,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getTimelineHtml: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -252,7 +991,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getJobGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -261,7 +1000,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getApplicantGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -275,11 +1014,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return store;
     }])
     .factory('profileService', ['$resource', '$q', '$http', 'ngZconnected', '$sce', function($resource, $q, $http, ngZconnected, $sce) {
-        'use strict';
+        
 
         // Detect if an API backend is present. If so, return the API module, else
         // hand off the localStorage adapter
-        'use strict';
+        
         var apiRoot = ngZconnected.apiUrl;
         var store = {
             cv: {
@@ -612,7 +1351,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
         return store;
     }])
     .service('registrationService', ['$http', '$resource', 'ngZconnected', function($http, $resource, ngZconnected) {
-        'use strict';
+        
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         var apiUrl = apiRoot + '/signup';
@@ -626,7 +1365,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
+    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, $http, $q, localStorageService, $filter) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -846,32 +1585,20 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
                 }
             }),
+            keywordKey: 'searchKeywords',
             saveToCompany: function(userId, companyId, cvId) {
                 return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
-
-                var str = [];
-
-                for (var p in searchCriterias) {
-                    if (searchCriterias.hasOwnProperty(p)) {
-                        if (searchCriterias[p])
-                            str.push(encodeURIComponent(p) + '=' + encodeURIComponent(searchCriterias[p]));
-                    }
-                }
-                url += '&' + str.join("&");
-                if (ngZconnected._DEBUG)
-                    console.log(url);
+                searchCriterias.limit = limit;
+                searchCriterias.page = page;
                 var deferred = $q.defer();
                 $http({
                         method: 'GET',
                         url: url,
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        params: {
-                            limit: limit,
-                            page: page
-                        }
+                        params: searchCriterias
                     })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
@@ -879,6 +1606,28 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error);
                     });
                 return deferred.promise;
+            },
+            storeSearchKeyword: function(keyword) {
+                var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
+                var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
+                if (existingEntry) {
+                    existingEntry.times++;
+                    existingEntry.timestamp = new Date();
+                } else {
+
+                    keywords.push({
+                        value: keyword,
+                        times: 1,
+                        timestamp: new Date()
+                    });
+                }
+                keywords = $filter('orderBy')(keywords, 'times', true);
+                localStorageService.set(this.keywordKey, angular.toJson(keywords));
+
+            },
+            getSearchHistory: function() {
+                var keywords = angular.fromJson(localStorageService.get(this.keywordKey));
+                return keywords || [];
             },
 
             parseCv: function(fileToUpload) {
@@ -1159,8 +1908,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getMostApplied: function(userId, companyId, limit, from, to) {
                 var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
-                $http.jsonp(url, {
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants';
+                $http.get(url, {
                     params: {
                         limit: limit,
                         from: from,
@@ -1191,7 +1940,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -1201,7 +1950,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getCount: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count?callback=JSON_CALLBACK').then(function(resp) {
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -1406,7 +2155,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .provider('authenticationInterceptor', [function() {
+    .provider('authenticationInterceptor', function() {
         var self = this;
         var errorCallbacks = [],
             successCallbacks = [];
@@ -1447,7 +2196,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             };
         }];
         return self;
-    }])
+    })
     .service('authenticationService', ['tokenService', 'ngZconnected', '$http', '$q', function(tokenService, ngZconnected, $http, $q) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
@@ -1511,3 +2260,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }]);
+
+angular.module('ngJoms', [])
+    .factory('ngJoms', function () {
+
+        //try { joms }
+        //catch (error) {
+        //    throw new Error('joms.js not loaded.');
+        //}
+        return joms;
+    });

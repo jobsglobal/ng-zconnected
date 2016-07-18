@@ -1,26 +1,6 @@
-angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
-    .config(['$httpProvider', 'authenticationInterceptorProvider', function($httpProvider, authenticationInterceptorProvider) {
-        $httpProvider.interceptors.push('authenticationInterceptor');
-        authenticationInterceptorProvider.error(function() {
+angular.module('ngZconnected.directives', ['checklist-model'])
 
-            $logoutElement = angular.element('#logoutLink');
-            if ($logoutElement.length > 0) {
-                window.location.href = $logoutElement.attr('href');
-            }
-        });
-
-    }])
-    .provider('ngZconnected', [function() {
-        var self = this;
-        this.setApiUrl = function(url) {
-            Zconnected.apiUrl = url;
-        };
-        this.$get = [function() {
-            return Zconnected;
-        }];
-        return self;
-    }])
-    .directive('nonZero', function() {
+.directive('nonZero', function() {
         return {
             restrict: 'A',
             require: 'ngModel',
@@ -183,8 +163,46 @@ angular.module('ngZconnected', ['ngZconnected.api', 'ngZconnected.templates'])
             }
         };
     })
-    .filter('html', ['$sce', function($sce) {
-        return function(text) {
-            return $sce.trustAsHtml(text);
+    .directive('multiselectChecklist', function() {
+        return {
+            restrict: 'E',
+            templateUrl: '/templates/ngMultiselectChecklist.html',
+            priority: 1001,
+            transclude: true,
+            scope: {
+                itemsList: '=',
+                displayProperty: '@',
+                valueProperty: '@',
+                selectedList: '=',
+                containerHeight: '@',
+                onChanged: '&'
+            },
+            controller: ['$scope', function($scope) {
+                $scope.filterChecklist = function(filter) {
+                    return function(item) {
+                        return (item[$scope.valueProperty].toLowerCase().indexOf(filter) > -1) || (!filter) || (!filter.length);
+                    }
+                }
+            }],
+            link: function(scope, element, attrs) {
+
+            }
+        }
+    })
+    .directive('subChecklist', [function() {
+        return {
+            restrict: 'E',
+            require: '^multiselectChecklist',
+            templateUrl: '/templates/ngChecklistSublist.html',
+            transclude: true,
+            scope: {
+                propertList: '@',
+                displayProperty: '@',
+                valueProperty: '@',
+
+            },
+            link: function(scope, element, attrs, multiselectChecklistCtrl) {
+                console.log(scope);
+            }
         };
     }]);

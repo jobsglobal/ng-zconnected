@@ -1,31 +1,34 @@
 {
-  "name": "ng-zconnected",
-  "description": "Front-end Angular library for Zconnected",
-  "main": "dist/zconnected.js",
-  "authors": [
-    "Josh Jim <joshjim27@gmail.com>"
-  ],
-  "license": "MIT",
-  "keywords": [
-    "ngZconnected",
-    "Zconnected",
-    "Jobsglobal"
-  ],
-  "homepage": "",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "angular": "^1.5.7",
-    "angular-resource": "^1.5.7",
-    "angular-cookies": "^1.5.7",
-    "jquery": "2.2.4",
-    "ng-file-upload": "^12.0.4",
-    "angular-bootstrap": "^1.3.3"
-  },
-  "version": "1.1.3"
+    "name": "ng-zconnected",
+    "description": "Front-end Angular library for Zconnected",
+    "main": ["dist/ng-zconnected.css", "dist/ng-zconnected.js"],
+
+    "authors": [
+        "Josh Jim <joshjim27@gmail.com>"
+    ],
+    "license": "MIT",
+    "keywords": [
+        "ngZconnected",
+        "Zconnected",
+        "Jobsglobal"
+    ],
+    "homepage": "",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "angular": "^1.5.7",
+        "angular-resource": "^1.5.7",
+        "angular-cookies": "^1.5.7",
+        "jquery": "2.2.4",
+        "ng-file-upload": "^12.0.4",
+        "angular-bootstrap": "^1.3.3",
+        "angular-local-storage": "^0.2.7",
+        "checklist-model": "^0.10.0"
+    },
+    "version": "1.1.3"
 }
