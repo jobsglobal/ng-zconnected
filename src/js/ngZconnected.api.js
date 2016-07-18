@@ -975,6 +975,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     method: 'GET',
                     url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/stopcampaign'
                 },
+                deleteCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
+                },
             }),
             get: function(userId, companyId, smscampaignid) {
                 return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
@@ -996,12 +1000,20 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return this.api.stopCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
             },
             deleteCampaign: function(userId, companyId, smscampaignid) {
-                return this.api.delete({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+                return this.api.deleteCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
             },
             recipient: {
                 api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
                     update: {
                         method: 'PUT'
+                    },
+                    processRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/process'
+                    },
+                    unProcessRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unprocess'
                     }
                 }),
                 update: function() {
@@ -1033,31 +1045,11 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         });
                     return deferred.promise;
                 },
-                processRecipient: function() {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/process', {
-                            limit: limit,
-                            page: page
-                        })
-                        .then(function(resp) {
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                    return deferred.promise;
+                processRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
                 },
                 unProcessRecipient: function() {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unprocess', {
-                            limit: limit,
-                            page: page
-                        })
-                        .then(function(resp) {
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                    return deferred.promise;
+                    return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
                 },
                 sendRecipient: function() {
                     var deferred = $q.defer();
