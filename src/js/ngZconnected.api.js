@@ -983,7 +983,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             get: function(userId, companyId, smscampaignid) {
                 return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
             },
-            save: function(userId, companyId) {
+            save: function(userId, companyId, smscampaign) {
                 if (smscampaign.hasOwnProperty('id')) {
                     return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
                 } else {
@@ -1025,7 +1025,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     }
 
                 }),
-                update: function() {
+                update: function(userId, companyId, smscampaignid, recipient) {
                     return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
                 },
                 getRecipient: function(userId, companyId, smscampaignid) {
