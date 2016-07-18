@@ -1,8 +1,4 @@
-angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
-    .config(['localStorageServiceProvider', function(localStorageServiceProvider) {
-        /* body... */
-        localStorageServiceProvider.setPrefix('ngZconnected');
-    }])
+angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected'])
     .factory('resourceService', ['$resource', 'ngZconnected', '$q', '$http', function($resource, ngZconnected, $q, $http) {
         var apiRoot = ngZconnected.apiUrl;
         var api = {
@@ -18,7 +14,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 get: function(countryid) {
                     return this.api.query({ countryid: countryid }).$promise;
-                    ss
                 }
             },
             cityList: {
@@ -147,42 +142,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 }
             },
-            experienceYearList: {
-                get: function() {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/experienceYear').success(function(resp) {
-                        deferred.resolve(resp);
-                    }, function(error) {
-                        deferred.reject(error);
-                    });
-                    return deferred.promise;
-                }
-            },
-            salaryRangeList: {
-                get: function() {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/salaryRange').success(function(resp) {
-                        deferred.resolve(resp);
-                    }, function(error) {
-                        deferred.reject(error);
-                    });
-                    return deferred.promise;
-                }
-            },
-            educationalLevelList: {
-                get: function() {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/educationalLevel').success(function(resp) {
-                        deferred.resolve(resp);
-                    }, function(error) {
-                        deferred.reject(error);
-                    });
-                    return deferred.promise;
-                }
-            },
             adList: function() {
                 var deferred = $q.defer();
-                $http.get(apiRoot + '/ads').then(function(resp) {
+                $http.jsonp(apiRoot + '/ads?callback=JSON_CALLBACK').then(function(resp) {
                     deferred.resolve(resp.data);
                 }, function(error) {
                     deferred.reject(error);
@@ -190,9 +152,9 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.promise;
             },
             modules: {
-                getAll: function() {
+                getAll: getModules = function() {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/module').then(function(resp) {
+                    $http.jsonp(apiRoot + '/module?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -278,7 +240,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getTimelineHtml: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities').then(function(resp) {
+                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/activities?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -290,7 +252,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getJobGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats').then(function(resp) {
+                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/stats?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -299,7 +261,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getApplicantGeneralStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
+                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -664,7 +626,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, $http, $q, localStorageService, $filter) {
+    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', function employerService($resource, ngZconnected, $http, $q) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -884,20 +846,32 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
                 }
             }),
-            keywordKey: 'searchKeywords',
             saveToCompany: function(userId, companyId, cvId) {
                 return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
-                searchCriterias.limit = limit;
-                searchCriterias.page = page;
+
+                var str = [];
+
+                for (var p in searchCriterias) {
+                    if (searchCriterias.hasOwnProperty(p)) {
+                        if (searchCriterias[p])
+                            str.push(encodeURIComponent(p) + '=' + encodeURIComponent(searchCriterias[p]));
+                    }
+                }
+                url += '&' + str.join("&");
+                if (ngZconnected._DEBUG)
+                    console.log(url);
                 var deferred = $q.defer();
                 $http({
                         method: 'GET',
                         url: url,
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        params: searchCriterias
+                        params: {
+                            limit: limit,
+                            page: page
+                        }
                     })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
@@ -905,28 +879,6 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error);
                     });
                 return deferred.promise;
-            },
-            storeSearchKeyword: function(keyword) {
-                var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
-                var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
-                if (existingEntry) {
-                    existingEntry.times++;
-                    existingEntry.timestamp = new Date();
-                } else {
-
-                    keywords.push({
-                        value: keyword,
-                        times: 1,
-                        timestamp: new Date()
-                    });
-                }
-                keywords = $filter('orderBy')(keywords, 'times', true);
-                localStorageService.set(this.keywordKey, angular.toJson(keywords));
-
-            },
-            getSearchHistory: function() {
-                var keywords = angular.fromJson(localStorageService.get(this.keywordKey));
-                return keywords || [];
             },
 
             parseCv: function(fileToUpload) {
@@ -962,7 +914,154 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.$promise;
             }
         };
-      
+        self.smsCampaign = {
+            api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                update: {
+                    method: 'PUT'
+                }
+            }),
+            get: function(userId, companyId, smscampaignid) {
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            save: function(userId, companyId){
+                if (smscampaign.hasOwnProperty('id')) {
+                    return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                } else {
+                    return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                }
+            },
+            getCampaign: function(userId, companyId, limit, page) {
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            runCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid  + '/runcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            stopCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/stopcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            deleteCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/deletecampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            recipient: {
+                api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    }
+                }),
+                update: function(){
+                    return this.api.save({ userId: userId, companyId: companyId, smscampaignid: smscampaignid}, recipient).$promise;
+                },
+                getRecipient: function(userId, companyId, smscampaignid){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                getRecipientById: function(userId, companyId, smscampaignid, recipientId){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                processRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/process', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unProcessRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unprocess', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                sendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/send', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unSendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unsend', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                }
+            }
+        };
     }])
     .service('smsService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
         var self = this;
@@ -1060,8 +1159,8 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             getMostApplied: function(userId, companyId, limit, from, to) {
                 var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants';
-                $http.get(url, {
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/job/listWithApplicants?callback=JSON_CALLBACK';
+                $http.jsonp(url, {
                     params: {
                         limit: limit,
                         from: from,
@@ -1092,7 +1191,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 },
                 getStats: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats').then(function(resp) {
+                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/stats?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
@@ -1102,7 +1201,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
 
                 getCount: function(userId, companyId) {
                     var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count').then(function(resp) {
+                    $http.jsonp(apiRoot + '/employer/' + userId + '/company/' + companyId + '/applicant/count?callback=JSON_CALLBACK').then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
                         deferred.reject(error);
