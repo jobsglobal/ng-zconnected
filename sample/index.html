@@ -14,8 +14,6 @@
             <ul>
                 <li>
                     <div class="col-lg-3">
-                        <multiselect-checklist data-items-list="vm.countries" data-display-property="nicename" data-value-property="nicename" data-selected-list="vm.selectedCountries" container-height="150">
-                        </multiselect-checklist>
                     </div>
                 </li>
             </ul>
@@ -35,35 +33,22 @@
             '$q',
             'userService',
             'authenticationService',
-            'resourceService',
+            'employerService',
             '$templateCache',
-            function($q, userService, authenticationService, resourceService, $templateCache) {
+            function($q, userService, authenticationService, employerService, $templateCache) {
                 var vm = this;
-                vm.countries = [];
                 vm.selectedCountries = [];
                 $q.when(authenticationService.login({
                         username: 'test9@jobsglobal.com',
                         password: 'User12345'
                     }))
                     .then(function(resp) {
-                        return resourceService.countryList.get();
+                        return employerService.smsCampaign.getCampaign();
                     })
-                    .then(function(countries) {
-                        console.log(countries);
-                        vm.countries = countries;
-                        angular.forEach(vm.countries, function(item) {
-                            item.sub = [{
-                                flag: "/media/com_zconjobs/img/flags/16x16/af.png",
-                                id: 1,
-                                iso: "AF",
-                                iso3: "AFG",
-                                name: "AFGHANISTAN",
-                                nationality: "Afghan",
-                                nicename: "Afghanistan",
-                                numcode: "4",
-                                phonecode: 93
-                            }]
-                        })
+                    .then(function(campaigns) {
+                        console.log(campaigns);
+
+
                     })
                     .catch(function(error) {
                         console.log(error);
