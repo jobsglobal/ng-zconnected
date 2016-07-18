@@ -3039,6 +3039,154 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.$promise;
             }
         };
+        self.smsCampaign = {
+            api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                update: {
+                    method: 'PUT'
+                }
+            }),
+            get: function(userId, companyId, smscampaignid) {
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            save: function(userId, companyId){
+                if (smscampaign.hasOwnProperty('id')) {
+                    return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, smscampaign).$promise;
+                } else {
+                    return this.api.save({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, smscampaign).$promise;
+                }
+            },
+            getCampaign: function(userId, companyId, limit, page) {
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            runCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid  + '/runcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            stopCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/stopcampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            deleteCampaign: function(userId, companyId, smscampaignid){
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/deletecampaign')
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
+            recipient: {
+                api: $resourse(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    }
+                }),
+                update: function(){
+                    return this.api.save({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, smsrecipientid: smsrecipientid}, recipient).$promise;
+                },
+                getRecipient: function(userId, companyId, smscampaignid){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                getRecipientById: function(userId, companyId, smscampaignid, recipientId){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                processRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/process', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unProcessRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unprocess', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                sendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/send', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                },
+                unSendRecipient: function(){
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId + '/unsend', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                    return deferred.promise;
+                }
+            }
+        };
     }])
     .service('smsService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
         var self = this;
