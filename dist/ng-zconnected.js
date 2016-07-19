@@ -1751,7 +1751,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 update: function(userId, companyId, smscampaignid, recipient) {
                     return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
                 },
-                getRecipient: function(userId, companyId, smscampaignid) {
+                getRecipient: function(userId, companyId, smscampaignid, limit, page) {
                     var deferred = $q.defer();
                     $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
                             limit: limit,
