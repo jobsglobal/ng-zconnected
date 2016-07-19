@@ -904,11 +904,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 searchCriterias.limit = limit;
                 searchCriterias.page = page;
                 var deferred = $q.defer();
-                $http({
-                        method: 'GET',
-                        url: url,
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        params: searchCriterias
+                $http.post(url, searchCriterias, {
+                        transformRequest: function() {
+                            console.log(arguments);
+                        }
                     })
                     .then(function(resp) {
                         deferred.resolve(resp.data);

@@ -39,6 +39,8 @@ gulp.task('sample', function() {
         .pipe(inject(files))
         .pipe(gulp.dest('.tmp/dist'))
         .pipe(connect.reload());
+    gulp.src('sample/sample.json')
+        .pipe(gulp.dest('.tmp/dist'));
 });
 var templateOptions = {
     root: '/',

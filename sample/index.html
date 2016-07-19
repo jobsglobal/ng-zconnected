@@ -34,8 +34,8 @@
             'userService',
             'authenticationService',
             'employerService',
-            '$templateCache',
-            function($q, userService, authenticationService, employerService, $templateCache) {
+            '$http',
+            function($q, userService, authenticationService, employerService, $http) {
                 var vm = this;
                 vm.selectedCountries = [];
                 $q.when(authenticationService.login({
@@ -43,12 +43,15 @@
                         password: 'User12345'
                     }))
                     .then(function(resp) {
-                        return employerService.smsCampaign.getCampaign();
+                        return $http.get('/sample.json');
                     })
-                    .then(function(campaigns) {
-                        console.log(campaigns);
+                    .then(function(sampleData) {
+                        console.log(sampleData);
+                        return employerService.cv.search(740, 182, sampleData.data);
 
-
+                    })
+                    .then(function(resp) {
+                        console.log(resp);
                     })
                     .catch(function(error) {
                         console.log(error);

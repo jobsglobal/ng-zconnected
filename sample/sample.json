@@ -1,0 +1,253 @@
+{
+    "any": [{
+        "text": "test"
+    }, {
+        "text": "testa"
+    }, {
+        "text": "asdfasd"
+    }],
+    "all": [{
+        "text": "asdfsadf"
+    }, {
+        "text": "asdfasdf"
+    }, {
+        "text": "sadfa"
+    }, {
+        "text": "sdf"
+    }],
+    "none": [{
+        "text": "fasdf"
+    }, {
+        "text": "asdf"
+    }, {
+        "text": "asd"
+    }, {
+        "text": "fasd"
+    }, {
+        "text": "fas"
+    }],
+    "locations": [{
+        "id": 1,
+        "iso": "AF",
+        "name": "AFGHANISTAN",
+        "nicename": "Afghanistan",
+        "iso3": "AFG",
+        "numcode": "4",
+        "phonecode": 93,
+        "nationality": "Afghan",
+        "flag": "/media/com_zconjobs/img/flags/16x16/af.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/af.png\" />",
+        "ticked": true
+    }, {
+        "id": 3,
+        "iso": "DZ",
+        "name": "ALGERIA",
+        "nicename": "Algeria",
+        "iso3": "DZA",
+        "numcode": "12",
+        "phonecode": 213,
+        "nationality": "Algerian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/dz.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/dz.png\" />",
+        "ticked": true
+    }, {
+        "id": 19,
+        "iso": "BB",
+        "name": "BARBADOS",
+        "nicename": "Barbados",
+        "iso3": "BRB",
+        "numcode": "52",
+        "phonecode": 1246,
+        "nationality": "Barbadian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bb.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bb.png\" />",
+        "ticked": true
+    }, {
+        "id": 31,
+        "iso": "IO",
+        "name": "BRITISH INDIAN OCEAN TERRITORY",
+        "nicename": "British Indian Ocean Territory",
+        "iso3": null,
+        "numcode": null,
+        "phonecode": 246,
+        "nationality": "British",
+        "flag": "/media/com_zconjobs/img/flags/16x16/io.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/io.png\" />",
+        "ticked": true
+    }, {
+        "id": 33,
+        "iso": "BG",
+        "name": "BULGARIA",
+        "nicename": "Bulgaria",
+        "iso3": "BGR",
+        "numcode": "100",
+        "phonecode": 359,
+        "nationality": "Bulgarian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bg.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bg.png\" />",
+        "ticked": true
+    }, {
+        "id": 34,
+        "iso": "BF",
+        "name": "BURKINA FASO",
+        "nicename": "Burkina Faso",
+        "iso3": "BFA",
+        "numcode": "854",
+        "phonecode": 226,
+        "nationality": "Burkinabe",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bf.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bf.png\" />",
+        "ticked": true
+    }],
+    "nationalities": [{
+        "id": 1,
+        "iso": "AF",
+        "name": "AFGHANISTAN",
+        "nicename": "Afghanistan",
+        "iso3": "AFG",
+        "numcode": "4",
+        "phonecode": 93,
+        "nationality": "Afghan",
+        "flag": "/media/com_zconjobs/img/flags/16x16/af.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/af.png\" />",
+        "ticked": true
+    }, {
+        "id": 2,
+        "iso": "AL",
+        "name": "ALBANIA",
+        "nicename": "Albania",
+        "iso3": "ALB",
+        "numcode": "8",
+        "phonecode": 355,
+        "nationality": "Albanian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/al.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/al.png\" />",
+        "ticked": true
+    }, {
+        "id": 4,
+        "iso": "AS",
+        "name": "AMERICAN SAMOA",
+        "nicename": "American Samoa",
+        "iso3": "ASM",
+        "numcode": "16",
+        "phonecode": 1684,
+        "nationality": "American",
+        "flag": "/media/com_zconjobs/img/flags/16x16/as.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/as.png\" />",
+        "ticked": true
+    }, {
+        "id": 5,
+        "iso": "AD",
+        "name": "ANDORRA",
+        "nicename": "Andorra",
+        "iso3": "AND",
+        "numcode": "20",
+        "phonecode": 376,
+        "nationality": "Andorran",
+        "flag": "/media/com_zconjobs/img/flags/16x16/ad.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/ad.png\" />",
+        "ticked": true
+    }, {
+        "id": 19,
+        "iso": "BB",
+        "name": "BARBADOS",
+        "nicename": "Barbados",
+        "iso3": "BRB",
+        "numcode": "52",
+        "phonecode": 1246,
+        "nationality": "Barbadian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bb.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bb.png\" />",
+        "ticked": true
+    }, {
+        "id": 26,
+        "iso": "BO",
+        "name": "BOLIVIA",
+        "nicename": "Bolivia",
+        "iso3": "BOL",
+        "numcode": "68",
+        "phonecode": 591,
+        "nationality": "Bolivian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bo.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bo.png\" />",
+        "ticked": true
+    }, {
+        "id": 27,
+        "iso": "BA",
+        "name": "BOSNIA AND HERZEGOVINA",
+        "nicename": "Bosnia and Herzegovina",
+        "iso3": "BIH",
+        "numcode": "70",
+        "phonecode": 387,
+        "nationality": "Bosnian, Herzegovinian",
+        "flag": "/media/com_zconjobs/img/flags/16x16/ba.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/ba.png\" />",
+        "ticked": true
+    }, {
+        "id": 28,
+        "iso": "BW",
+        "name": "BOTSWANA",
+        "nicename": "Botswana",
+        "iso3": "BWA",
+        "numcode": "72",
+        "phonecode": 267,
+        "nationality": "Motswana",
+        "flag": "/media/com_zconjobs/img/flags/16x16/bw.png",
+        "icon": "<img src=\"/media/com_zconjobs/img/flags/16x16/bw.png\" />",
+        "ticked": true
+    }],
+    "gender": [{
+        "description": "Male",
+        "value": "M",
+        "ticked": true
+    }],
+    "salaryRange": [{
+        "id": 1,
+        "description": "Less than 500",
+        "value": {
+            "min": "1",
+            "max": "500"
+        },
+        "ticked": true
+    }],
+    "ageRange": [{
+        "id": 1,
+        "description": "0 - 1 years",
+        "value": {
+            "min": 0,
+            "max": 1
+        },
+        "ticked": true
+    }],
+    "experienceYearRange": [{
+        "id": 1,
+        "description": "0 - 1 years",
+        "value": {
+            "min": 0,
+            "max": 1
+        },
+        "ticked": true
+    }],
+    "industries": [{
+        "id": 1,
+        "description": "Advertising/PR/Events",
+        "flag": "top",
+        "ticked": true
+    }, {
+        "id": 29,
+        "description": "Agriculture/ Dairy Based",
+        "flag": "other",
+        "ticked": true
+    }, {
+        "id": 3,
+        "description": "Banking/ Financial Services",
+        "flag": "top",
+        "ticked": true
+    }],
+    "educationalLevel": [{
+        "id": 1,
+        "description": "Associate's Degree",
+        "value": "Associate's Degree",
+        "ticked": true
+    }]
+}
