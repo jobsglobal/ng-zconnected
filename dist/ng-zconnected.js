@@ -670,6 +670,17 @@ angular.module('ngZconnected.directives', ['checklist-model'])
                 console.log(scope.onChange);
             }
         }
+    })
+    .directive('errSrc', function() {
+        return {
+            link: function(scope, element, attrs) {
+                element.bind('error', function() {
+                    if (attrs.src != attrs.errSrc) {
+                        attrs.$set('src', attrs.errSrc);
+                    }
+                });
+            }
+        }
     });
 
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
