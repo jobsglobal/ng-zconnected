@@ -147,6 +147,50 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 }
             },
+            experienceYearList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/experienceYear').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            salaryRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/salaryRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            educationalLevelList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/educationalLevel').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            ageRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/ageRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
             adList: function() {
                 var deferred = $q.defer();
                 $http.get(apiRoot + '/ads').then(function(resp) {
@@ -927,6 +971,112 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.rejectd(error);
                     });
                 return deferred.$promise;
+            }
+        };
+        self.smsCampaign = {
+            api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                update: {
+                    method: 'PUT'
+                },
+                runCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/runcampaign'
+                },
+                stopCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/stopcampaign'
+                },
+                deleteCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
+                },
+            }),
+            get: function(userId, companyId, smscampaignid) {
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            save: function(userId, companyId, smscampaign) {
+                if (smscampaign.hasOwnProperty('id')) {
+                    return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                } else {
+                    return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                }
+            },
+            getCampaign: function(userId, companyId, limit, page) {
+                return this.api.get({ userId: userId, companyId: companyId, limit: limit, page: page }).$promise;
+            },
+            runCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            stopCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.stopCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            deleteCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.deleteCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            recipient: {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    },
+                    processRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/process'
+                    },
+                    unProcessRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unprocess'
+                    },
+                    sendRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/send'
+                    },
+                    unSendRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unsend'
+                    }
+
+                }),
+                update: function(userId, companyId, smscampaignid, recipient) {
+                    return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
+                },
+                getRecipient: function(userId, companyId, smscampaignid) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                            limit: limit,
+                            page: page
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                },
+                getRecipientById: function(userId, companyId, smscampaignid, recipientId) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                            limit: limit,
+                            page: page
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                },
+                processRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                unProcessRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.unProcessRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                sendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.sendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                unSendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.unSendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                }
             }
         };
     }])

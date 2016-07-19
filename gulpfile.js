@@ -41,7 +41,7 @@ gulp.task('sample', function() {
         .pipe(connect.reload());
 });
 var templateOptions = {
-    root: '/templates',
+    root: '/',
     module: 'ngZconnected.templates',
     standalone: true
 };

@@ -1,7 +1,8 @@
-angular.module("ngZconnected.templates", []).run(['$templateCache', function($templateCache) {$templateCache.put("/templates/templates/ngLoader.html","<div class=zloader><div class=sk-circle><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>");
-$templateCache.put("/templates/templates/ngModal.html","");
-$templateCache.put("/templates/templates/ngMultiselectChecklist.html","<div class=checklist-container><input type=text class=cv_search_subinput><ul class=checkbox-list style=\"height: {{containerHeight}}px\"><li data-ng-repeat=\"item in itemsList\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=item[displayProperty]><p>{{item[displayProperty]}}</p><ul class=checkbox-sublist><li><input type=checkbox><p>Sample text</p></li><li><input type=checkbox><p>Sample text</p></li><li><input type=checkbox><p>Sample text</p></li></ul></li></ul></div>");
-$templateCache.put("/templates/templates/ngPagination.html","<ul class=pagination><li ng-if=::boundaryLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-first><a ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-prev><a ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li><li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=pagination-page><a ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-next><a ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li><li ng-if=::boundaryLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-last><a ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li></ul>");}]);
+angular.module("ngZconnected.templates", []).run(['$templateCache', function($templateCache) {$templateCache.put("/templates/ngChecklistSublist.html","<li data-ng-repeat=\"subItem in sublist | filter: filterChecklist(filterKey)\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=subItem[sublistDisplayProperty]><p>{{subItem[sublistDisplayProperty]}}</p></li>");
+$templateCache.put("/templates/ngLoader.html","<div class=zloader><div class=sk-circle><div class=\"sk-circle1 sk-child\"></div><div class=\"sk-circle2 sk-child\"></div><div class=\"sk-circle3 sk-child\"></div><div class=\"sk-circle4 sk-child\"></div><div class=\"sk-circle5 sk-child\"></div><div class=\"sk-circle6 sk-child\"></div><div class=\"sk-circle7 sk-child\"></div><div class=\"sk-circle8 sk-child\"></div><div class=\"sk-circle9 sk-child\"></div><div class=\"sk-circle10 sk-child\"></div><div class=\"sk-circle11 sk-child\"></div><div class=\"sk-circle12 sk-child\"></div></div></div>");
+$templateCache.put("/templates/ngModal.html","");
+$templateCache.put("/templates/ngMultiselectChecklist.html","<div class=checklist-container><input type=text class=cv_search_subinput ng-model=filterKey><ul class=checkbox-list style=\"height: {{containerHeight}}px\"><li data-ng-repeat=\"item in itemsList | filter: filterChecklist(filterKey)\"><input type=checkbox data-checklist-model=selectedList data-checklist-value=item[displayProperty]><p>{{item[displayProperty]}}</p><ul class=checkbox-sublist data-ng-transclude></ul></li></ul></div>");
+$templateCache.put("/templates/ngPagination.html","<ul class=pagination><li ng-if=::boundaryLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-first><a ng-click=\"selectPage(1, $event)\">{{::getText(\'first\')}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noPrevious()||ngDisabled}\" class=pagination-prev><a ng-click=\"selectPage(page - 1, $event)\">{{::getText(\'previous\')}}</a></li><li ng-repeat=\"page in pages track by $index\" ng-class=\"{active: page.active,disabled: ngDisabled&&!page.active}\" class=pagination-page><a ng-click=\"selectPage(page.number, $event)\">{{page.text}}</a></li><li ng-if=::directionLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-next><a ng-click=\"selectPage(page + 1, $event)\">{{::getText(\'next\')}}</a></li><li ng-if=::boundaryLinks ng-class=\"{disabled: noNext()||ngDisabled}\" class=pagination-last><a ng-click=\"selectPage(totalPages, $event)\">{{::getText(\'last\')}}</a></li></ul>");}]);
 var Zconnected = (function($) {
     var _DEBUG = true;
     //The following configuration is only for sublime debugging.
@@ -657,17 +658,26 @@ angular.module('ngZconnected.directives', ['checklist-model'])
     .directive('multiselectChecklist', function() {
         return {
             restrict: 'E',
-            templateUrl: '/src/templates/ngMultiselectChecklist.html',
+            templateUrl: '/templates/ngMultiselectChecklist.html',
             priority: 1001,
+            transclude: true,
             scope: {
                 itemsList: '=',
                 displayProperty: '@',
                 valueProperty: '@',
                 selectedList: '=',
-                containerHeight: '@'
+                containerHeight: '@',
+                onChanged: '&'
             },
+            controller: ['$scope', function($scope) {
+                $scope.filterChecklist = function(filter) {
+                    return function(item) {
+                        return (item[$scope.valueProperty].toLowerCase().indexOf(filter) > -1) || (!filter) || (!filter.length);
+                    }
+                }
+            }],
             link: function(scope, element, attrs) {
-                console.log(scope.onChange);
+
             }
         }
     })
@@ -681,6 +691,23 @@ angular.module('ngZconnected.directives', ['checklist-model'])
                 });
             }
         }
+    })
+    .directive('subChecklist', function() {
+        return {
+            restrict: 'E',
+            require: '^multiselectChecklist',
+            templateUrl: '/templates/ngChecklistSublist.html',
+            transclude: true,
+            scope: {
+                propertList: '@',
+                displayProperty: '@',
+                valueProperty: '@',
+
+            },
+            link: function(scope, element, attrs, multiselectChecklistCtrl) {
+                console.log(scope);
+            }
+        };
     });
 
 angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
@@ -825,6 +852,50 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 get: function() {
                     var deferred = $q.defer();
                     $http.get(apiRoot + '/company/size').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            experienceYearList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/experienceYear').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            salaryRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/salaryRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            educationalLevelList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/educationalLevel').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
+            ageRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/ageRange').success(function(resp) {
                         deferred.resolve(resp);
                     }, function(error) {
                         deferred.reject(error);
@@ -1612,6 +1683,112 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.rejectd(error);
                     });
                 return deferred.$promise;
+            }
+        };
+        self.smsCampaign = {
+            api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                update: {
+                    method: 'PUT'
+                },
+                runCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/runcampaign'
+                },
+                stopCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/stopcampaign'
+                },
+                deleteCampaign: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
+                },
+            }),
+            get: function(userId, companyId, smscampaignid) {
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            save: function(userId, companyId, smscampaign) {
+                if (smscampaign.hasOwnProperty('id')) {
+                    return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                } else {
+                    return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                }
+            },
+            getCampaign: function(userId, companyId, limit, page) {
+                return this.api.get({ userId: userId, companyId: companyId, limit: limit, page: page }).$promise;
+            },
+            runCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            stopCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.stopCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            deleteCampaign: function(userId, companyId, smscampaignid) {
+                return this.api.deleteCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+            },
+            recipient: {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    },
+                    processRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/process'
+                    },
+                    unProcessRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unprocess'
+                    },
+                    sendRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/send'
+                    },
+                    unSendRecipient: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unsend'
+                    }
+
+                }),
+                update: function(userId, companyId, smscampaignid, recipient) {
+                    return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
+                },
+                getRecipient: function(userId, companyId, smscampaignid) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                            limit: limit,
+                            page: page
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                },
+                getRecipientById: function(userId, companyId, smscampaignid, recipientId) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                            limit: limit,
+                            page: page
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                },
+                processRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                unProcessRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.unProcessRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                sendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.sendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                },
+                unSendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                    return this.api.unSendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                }
             }
         };
     }])
