@@ -1616,11 +1616,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 searchCriterias.limit = limit;
                 searchCriterias.page = page;
                 var deferred = $q.defer();
-                $http.post(url, searchCriterias, {
-                        transformRequest: function() {
-                            console.log(arguments);
-                        }
-                    })
+                $http.post(url, searchCriterias)
                     .then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
