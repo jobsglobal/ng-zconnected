@@ -881,6 +881,17 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 }
             },
+            ageRangeList: {
+                get: function() {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/ageRange').success(function(resp) {
+                        deferred.resolve(resp);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                    return deferred.promise;
+                }
+            },
             adList: function() {
                 var deferred = $q.defer();
                 $http.get(apiRoot + '/ads').then(function(resp) {
