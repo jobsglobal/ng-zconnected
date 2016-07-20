@@ -1000,7 +1000,17 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 }
             },
             getCampaign: function(userId, companyId, limit, page) {
-                return this.api.get({ userId: userId, companyId: companyId, limit: limit, page: page }).$promise;
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign', {
+                        limit: limit,
+                        page: page
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
             },
             runCampaign: function(userId, companyId, smscampaignid) {
                 return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
