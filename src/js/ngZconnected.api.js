@@ -915,6 +915,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                 return deferred.promise;
             },
+            getSearchKeywordSuggestions: function(userId, companyId, $keyword) {
+                if (!userId || !companyId)
+                    throw "missing userId and companyId";
+                var deferred = $q.defer();
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/keywords?q=' + $keyword)
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    });
+                return deferred.promise;
+            },
             storeSearchKeyword: function(keyword) {
                 var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
                 var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
