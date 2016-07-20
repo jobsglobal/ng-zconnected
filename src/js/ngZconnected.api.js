@@ -1040,6 +1040,25 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     })
                 return deferred.promise;
             },
+            getSearchCampaign: function(userId, companyId, search, limit, page) {
+                limit = limit || 10;
+                page = page || 1;
+                var deferred = $q.defer();
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/search';
+                $http.get(url, {
+                        params: {
+                            search: search,
+                            limit: limit,
+                            page: page
+                        }
+                    })
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error.data);
+                    })
+                return deferred.promise;
+            },
             runCampaign: function(userId, companyId, smscampaignid) {
                 return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
             },
