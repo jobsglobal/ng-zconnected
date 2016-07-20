@@ -1613,10 +1613,13 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
-                searchCriterias.limit = limit;
-                searchCriterias.page = page;
                 var deferred = $q.defer();
-                $http.post(url, searchCriterias)
+                $http.post(url, searchCriterias, {
+                        params: {
+                            limit: limit,
+                            page: page
+                        }
+                    })
                     .then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
