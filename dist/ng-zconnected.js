@@ -1611,6 +1611,17 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             saveToCompany: function(userId, companyId, cvId) {
                 return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
             },
+            getSearchStats: function(userId, companyId, searchCriterias) {
+                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/stats';
+                var deferred = $q.defer();
+                $http.post(url, searchCriterias)
+                    .then(function(resp) {
+                        deferred.resolve(resp.data);
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+                return deferred.promise;
+            },
             search: function(userId, companyId, searchCriterias, limit, page) {
                 var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
                 var deferred = $q.defer();
@@ -1631,7 +1642,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 if (!userId || !companyId)
                     throw "missing userId and companyId";
                 var deferred = $q.defer();
-                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/keywords?q=' + $keyword)
+                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/suggestions?q=' + $keyword)
                     .then(function(resp) {
                         deferred.resolve(resp.data);
                     }, function(error) {
