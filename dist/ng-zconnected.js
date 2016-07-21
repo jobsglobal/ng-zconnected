@@ -1387,7 +1387,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, $http, $q, localStorageService, $filter) {
+    .service('employerService', ['$resource', 'ngZconnected', 'upload', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, upload, $http, $q, localStorageService, $filter) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -1751,6 +1751,14 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error.data);
                     })
                 return deferred.promise;
+            },
+            uploadCsv: function(userId, companyid, smscampaign, file) {
+                var data = {};
+                data.photo = file;
+                return Upload.upload({
+                    url: apiRoot + '/employer/' + userId + '/company/' + companyid + '/smscampaign/' + smscampaign + '/uploadfile',
+                    data: data
+                });
             },
             getSearchCampaign: function(userId, companyId, search, limit, page) {
                 limit = limit || 10;
