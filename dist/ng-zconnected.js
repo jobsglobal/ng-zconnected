@@ -1387,7 +1387,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', 'upload', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, upload, $http, $q, localStorageService, $filter) {
+    .service('employerService', ['$resource', 'ngZconnected', 'Upload', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, Upload, $http, $q, localStorageService, $filter) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
         self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
@@ -1754,7 +1754,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             },
             uploadCsv: function(userId, companyId, smscampaignid, file) {
                 var data = {};
-                data.photo = file;
+                data.csv = file;
                 return Upload.upload({
                     url: apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/uploadfile',
                     data: data

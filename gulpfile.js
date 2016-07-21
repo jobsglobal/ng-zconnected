@@ -26,6 +26,7 @@ var annotateOptions = {
     add: true,
     single_quotes: true
 };
+var zconnectPath = 'C:/jobsglobal/media/com_zconjobs/js/bower_components/ng-zconnected/dist';
 gulp.task('sample', function() {
     var files = gulp.src(['dist/**/' + pkg.name + '.js', 'dist/**/' + pkg.name + '.css'])
         .pipe(_if('*.js', angularFilesort()));
@@ -52,9 +53,11 @@ gulp.task('css', function() {
     gulp.src(['src/**/*.css', 'src/**/*.less'])
         .pipe(concat(pkg.name + '.css'))
         .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest(zconnectPath))
         .pipe(rename(pkg.name + '.min.css'))
         .pipe(minifyCss())
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest(zconnectPath));
 });
 gulp.task('js', function() {
     gulp.src(['src/**/*.js', 'src/**/*.html'])
@@ -65,9 +68,11 @@ gulp.task('js', function() {
         .pipe(concat(pkg.name + '.js'))
         .pipe(ngAnnotate(annotateOptions))
         .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest(zconnectPath))
         .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest(zconnectPath));
 });
 gulp.task('clean', function(cb) {
     del(['dist', '.tmp'], cb);
