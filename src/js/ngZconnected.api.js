@@ -1011,6 +1011,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     method: 'GET',
                     url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
                 },
+                uploadCsv: {
+                    method: 'GET',
+                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/uploadfile'
+                },
             }),
             get: function(userId, companyId, smscampaignid) {
                 return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
@@ -1040,13 +1044,10 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     })
                 return deferred.promise;
             },
-            uploadCsv: function(userId, companyid, smscampaign, file) {
+            uploadCsv: function(userId, companyId, smscampaignid, file) {
                 var data = {};
                 data.photo = file;
-                return Upload.upload({
-                    url: apiRoot + '/employer/' + userId + '/company/' + companyid + '/smscampaign/' + smscampaign + '/uploadfile',
-                    data: data
-                });
+                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, data).$promise;
             },
             getSearchCampaign: function(userId, companyId, search, limit, page) {
                 limit = limit || 10;
