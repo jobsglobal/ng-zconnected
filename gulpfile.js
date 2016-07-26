@@ -53,11 +53,9 @@ gulp.task('css', function() {
     gulp.src(['src/**/*.css', 'src/**/*.less'])
         .pipe(concat(pkg.name + '.css'))
         .pipe(gulp.dest('dist'))
-        .pipe(gulp.dest(zconnectPath))
         .pipe(rename(pkg.name + '.min.css'))
         .pipe(minifyCss())
-        .pipe(gulp.dest('dist'))
-        .pipe(gulp.dest(zconnectPath));
+        .pipe(gulp.dest('dist'));
 });
 gulp.task('js', function() {
     gulp.src(['src/**/*.js', 'src/**/*.html'])
@@ -68,11 +66,9 @@ gulp.task('js', function() {
         .pipe(concat(pkg.name + '.js'))
         .pipe(ngAnnotate(annotateOptions))
         .pipe(gulp.dest('dist'))
-        .pipe(gulp.dest(zconnectPath))
         .pipe(rename(pkg.name + '.min.js'))
         .pipe(uglify())
-        .pipe(gulp.dest('dist'))
-        .pipe(gulp.dest(zconnectPath));
+        .pipe(gulp.dest('dist'));
 });
 gulp.task('clean', function(cb) {
     del(['dist', '.tmp'], cb);
