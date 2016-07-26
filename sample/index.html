@@ -49,7 +49,7 @@
                     .then(function(sampleData) {
                         console.log(sampleData);
                         employerService.cv.storeSearchFilter(740, 182, sampleData.data);
-                        var searchHistory = employerService.cv.getSearchHistory();
+                        var searchHistory = employerService.cv.getSearchHistory(740, 182);
                         vm.searchHistory = searchHistory;
                     })
                     .catch(function(error) {

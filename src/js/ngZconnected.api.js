@@ -948,7 +948,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     return deferred.promise;
                 },
                 storeSearchFilter: function(userId, companyId, filter) {
-                    var filters = angular.fromJson(localStorageService.get(this.filterKey)) || [];
+                    var filters = angular.fromJson(localStorageService.get(this.filterKey + userId + companyId)) || [];
                     var filterHash = md5.createHash(angular.toJson(filter));
                     var existingEntry = $filter('filter')(filters, { hash: filterHash })[0];
                     if (existingEntry) {
@@ -966,7 +966,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     localStorageService.set(this.filterKey, angular.toJson(filters));
 
                 },
-                getSearchHistory: function() {
+                getSearchHistory: function(userId, companyId) {
                     var keywords = angular.fromJson(localStorageService.get(this.filterKey));
                     return keywords || [];
                 },
