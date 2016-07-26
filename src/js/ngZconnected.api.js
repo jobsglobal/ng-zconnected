@@ -938,7 +938,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     });
                 return deferred.promise;
             },
-            storeSearchKeyword: function(keyword) {
+            storeSearchFilter: function(keyword) {
                 var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
                 var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
                 if (existingEntry) {
