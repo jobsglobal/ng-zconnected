@@ -2195,6 +2195,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                         deferred.reject(error.data);
                     });
                 return deferred.promise;
+            },
+            password : {
+                api: $resource(apiRoot + '/user/:userId/password', {
+                    update: {
+                        method: 'PUT'
+                    }
+                }),
+                save: function(userId, userPassword) {
+                    if (userPassword.hasOwnProperty('id')) {
+                        return this.api.update({ userId: userId }, userPassword).$promise;
+                    }
+                },
             }
         };
     }])
