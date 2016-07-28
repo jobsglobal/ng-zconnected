@@ -1401,7 +1401,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             }
         };
     }])
-    .factory('userService', ['$http', '$q', '$window', 'ngZconnected', function($http, $q, $window, ngZconnected) {
+    .factory('userService', ['$http', '$q', '$window', 'ngZconnected', '$resource', function($http, $q, $window, ngZconnected, $resource) {
         var apiRoot = ngZconnected.apiUrl;
         return {
             getCurrentUser: function() {
