@@ -710,7 +710,7 @@ angular.module('ngZconnected.directives', ['checklist-model'])
         };
     });
 
-angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule'])
+angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', 'ngZconnected', 'LocalStorageModule', 'angular-md5'])
     .config(['localStorageServiceProvider', function(localStorageServiceProvider) {
         /* body... */
         localStorageServiceProvider.setPrefix('ngZconnected');
@@ -1387,474 +1387,478 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
             return self.api.parsedCvSignup({}, parsedCv).$promise;
         };
     }])
-    .service('employerService', ['$resource', 'ngZconnected', 'Upload', '$http', '$q', 'localStorageService', '$filter', function employerService($resource, ngZconnected, Upload, $http, $q, localStorageService, $filter) {
-        var self = this;
-        var apiRoot = ngZconnected.apiUrl;
-        self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
-        self.getEmployerProfile = function(userId) {
-            return self.api.get({ userId: userId }).$promise;
-        };
-        self.updateEmployerProfile = function(userId, employerProfile) {
-            return self.api.update({ userId: userId }, employerProfile).$promise;
-        };
-        self.jobseekerScreening = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/:screenedJobseekerId', {
-                screenedJobseekerId: '@id'
-            }, {
-                update: {
-                    method: "PUT"
-                },
-                query: {
-                    method: 'GET',
-                    isArray: false
-                },
-                getByJobseekerId: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/byJobseekerId/:jobseekerId'
-                }
-            }),
-            get: function(userId, companyId, screenedJobseekerId) {
-                return this.api.get({
-                    userId: userId,
-                    companyId: companyId,
-                    screenedJobseekerId: screenedJobseekerId
-                }).$promise;
-            },
-            query: function(userId, companyId) {
-                return this.api.query({ userId: userId, companyId: companyId }).$promise;
-            },
-            save: function(userId, companyId, screenedJobseekerData) {
-                if (screenedJobseekerData.hasOwnProperty('id')) {
-                    return this.api.update({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
-
-                } else {
-                    return this.api.save({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
-                }
-            },
-            remove: function(userId, companyId, screenedJobseekerData) {
-                return this.api.remove({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
-            },
-            getByJobseekerId: function(userId, companyId, jobseekerId) {
-                //var resource = $resource(apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/byJobseekerId/:jobseekerId');
-                return this.api.getByJobseekerId({
-                    userId: userId,
-                    companyId: companyId,
-                    jobseekerId: jobseekerId
-                }).$promise;
-            }
-        };
-        self.shortlist = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId', { shortlistId: '@id' }, {
-                update: {
-                    method: 'PUT'
-                },
-                getChildren: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId/child'
-                },
-                query: {
-                    method: 'GET',
-                    isArray: false
-                },
-                getUserFolder: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId/userFolder'
-
-                },
-                getByJobseekerId: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/shortlistByJobseekerId/:jobseekerId'
-                }
-            }),
-            get: function(userId, companyId, shortlistId) {
-                return this.api.get({
-                    userId: userId,
-                    companyId: companyId,
-                    shortlistId: shortlistId
-                }).$promise;
-            },
-            query: function(userId, companyId) {
-                return this.api.query({
-                    userId: userId,
-                    companyId: companyId
-                }).$promise;
-            },
-            save: function(userId, companyId, shortlistNode) {
-                if (shortlistNode.hasOwnProperty('id')) {
-                    return this.api.update({
+    .service('employerService', ['$resource', 'ngZconnected', 'Upload', '$http', '$q', 'localStorageService', '$filter', 'md5', function employerService($resource, ngZconnected, Upload, $http, $q, localStorageService, $filter, md5) {
+            var self = this;
+            var apiRoot = ngZconnected.apiUrl;
+            self.api = $resource(apiRoot + '/employer/:userId', null, { update: { method: 'update' } });
+            self.getEmployerProfile = function(userId) {
+                return self.api.get({ userId: userId }).$promise;
+            };
+            self.updateEmployerProfile = function(userId, employerProfile) {
+                return self.api.update({ userId: userId }, employerProfile).$promise;
+            };
+            self.jobseekerScreening = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/:screenedJobseekerId', {
+                    screenedJobseekerId: '@id'
+                }, {
+                    update: {
+                        method: "PUT"
+                    },
+                    query: {
+                        method: 'GET',
+                        isArray: false
+                    },
+                    getByJobseekerId: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/byJobseekerId/:jobseekerId'
+                    }
+                }),
+                get: function(userId, companyId, screenedJobseekerId) {
+                    return this.api.get({
                         userId: userId,
-                        companyId: companyId
-                    }, shortlistNode).$promise;
-                } else {
-                    return this.api.save({
+                        companyId: companyId,
+                        screenedJobseekerId: screenedJobseekerId
+                    }).$promise;
+                },
+                query: function(userId, companyId) {
+                    return this.api.query({ userId: userId, companyId: companyId }).$promise;
+                },
+                save: function(userId, companyId, screenedJobseekerData) {
+                    if (screenedJobseekerData.hasOwnProperty('id')) {
+                        return this.api.update({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
+
+                    } else {
+                        return this.api.save({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
+                    }
+                },
+                remove: function(userId, companyId, screenedJobseekerData) {
+                    return this.api.remove({ userId: userId, companyId: companyId }, screenedJobseekerData).$promise;
+                },
+                getByJobseekerId: function(userId, companyId, jobseekerId) {
+                    //var resource = $resource(apiRoot + '/employer/:userId/company/:companyId/screenedJobseeker/byJobseekerId/:jobseekerId');
+                    return this.api.getByJobseekerId({
                         userId: userId,
-                        companyId: companyId
-                    }, shortlistNode).$promise;
+                        companyId: companyId,
+                        jobseekerId: jobseekerId
+                    }).$promise;
                 }
-            },
-            remove: function(userId, companyId, shortlistId) {
-                return this.api.remove({
-                    userId: userId,
-                    companyId: companyId,
-                    shortlistId: shortlistId
-                }).$promise;
-            },
-            getChildren: function(userId, companyId, shortlistId) {
-                return this.api.getChildren({
-                    userId: userId,
-                    companyId: companyId,
-                    shortlistId: shortlistId
-                }).$promise;
-            },
-            getUserFolder: function(userId, companyId, shortlistId) {
-                return this.api.getUserFolder({
-                    userId: userId,
-                    companyId: companyId,
-                    shortlistId: shortlistId
-                }).$promise;
-            },
-            getByJobseekerId: function(userId, companyId, jobseekerId) {
-                return this.api.getByJobseekerId({
-                    userId: userId,
-                    companyId: companyId,
-                    jobseekerId: jobseekerId
-                }).$promise;
-            }
-        };
-        self.employee = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/employee/:employeeId', { employeeId: '@id' }, {
-                update: {
-                    method: 'PUT'
-                },
-                query: {
-                    method: 'GET',
-                    isArray: false,
-                    url: apiRoot + '/employer/:userId/company/:companyId/employee'
-                },
-                sendInvite: {
-                    method: 'POST',
-                    url: apiRoot + '/employer/:userId/company/:companyId/employee/invite'
-                }
-
-            }),
-            get: function(userId, companyId, employeeId) {
-                return this.api.get({ userId: userId, companyId: companyId, employeeId: employeeId }).$promise;
-            },
-            query: function(userId, companyId, limit, page, qname) {
-                limit = limit || 0;
-                page = page || 0;
-                return this.api.query({
-                    userId: userId,
-                    companyId: companyId,
-                    page: page,
-                    limit: limit,
-                    qname: qname
-                }).$promise;
-            },
-            save: function(userId, companyId, employee) {
-                if (employee.hasOwnProperty('id')) {
-                    return this.api.update({ userId: userId, companyId: companyId }, employee).$promise;
-                } else {
-                    return this.api.save({ userId: userId, companId: companyId }, employee).$promise;
-                }
-            },
-            remove: function(userId, companyId, employeeId) {
-                return this.api.remove({
-                    userId: userId,
-                    companyId: companyId,
-                    employeeId: employeeId
-                }).$promise;
-            },
-            sendInvite: function(userId, companyId, employeeId) {
-                return this.api.sendInvite({ userId: userId, companyId: companyId }, { employee_id: employeeId }).$promise;
-            }
-        };
-        self.emailCv = {
-            api: $resource(apiRoot + "/employer/:userId/emailCv", null, {
-                sendCv: {
-                    method: "POST"
-                }
-            }),
-
-            sendCv: function(userId, requestData) {
-                return this.api.sendCv({ userId: userId }, requestData).$promise;
-            }
-        };
-        self.jobGroup = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/jobgroup/:jobgroupId', { jobgroupId: '@id' }, {
-                update: {
-                    method: 'PUT'
-                }
-            }),
-            get: function(userId, companyId, jobgroupId) {
-                return this.api.get({ userId: userId, companyId: companyId, jobgroupId: jobgroupId }).$promise;
-            },
-            save: function(userId, companyId, jobgroup) {
-                if (jobgroup.hasOwnProperty('id')) {
-                    return this.api.update({ userId: userId, companyId: companyId }, jobgroup).$promise;
-                } else {
-                    return this.api.save({ userId: userId, companyId: companyId }, jobgroup).$promise;
-                }
-            },
-            remove: function(userId, companyId, jobgroupId) {
-                return this.api.remove({ userId: userId, companyId: companyId, jobgroupId: jobgroupId }).$promise;
-            }
-        };
-        self.cv = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/cv/:cvId', { cvId: '@id' }, {
-                saveToCompany: {
-                    method: "POST",
-                    url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
-                }
-            }),
-            keywordKey: 'searchKeywords',
-            saveToCompany: function(userId, companyId, cvId) {
-                return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
-            },
-            getSearchStats: function(userId, companyId, searchCriterias) {
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/stats';
-                var deferred = $q.defer();
-                $http.post(url, searchCriterias)
-                    .then(function(resp) {
-                        deferred.resolve(resp.data);
-                    }, function(error) {
-                        deferred.reject(error);
-                    });
-                return deferred.promise;
-            },
-            search: function(userId, companyId, searchCriterias, limit, page) {
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
-                var deferred = $q.defer();
-                $http.post(url, searchCriterias, {
-                        params: {
-                            limit: limit,
-                            page: page
-                        }
-                    })
-                    .then(function(resp) {
-                        deferred.resolve(resp.data);
-                    }, function(error) {
-                        deferred.reject(error);
-                    });
-                return deferred.promise;
-            },
-            getSearchKeywordSuggestions: function(userId, companyId, $keyword) {
-                if (!userId || !companyId)
-                    throw "missing userId and companyId";
-                var deferred = $q.defer();
-                $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/suggestions?q=' + $keyword)
-                    .then(function(resp) {
-                        deferred.resolve(resp.data);
-                    }, function(error) {
-                        deferred.reject(error.data);
-                    });
-                return deferred.promise;
-            },
-            storeSearchKeyword: function(keyword) {
-                var keywords = angular.fromJson(localStorageService.get(this.keywordKey)) || [];
-                var existingEntry = $filter('filter')(keywords, { value: keyword })[0];
-                if (existingEntry) {
-                    existingEntry.times++;
-                    existingEntry.timestamp = new Date();
-                } else {
-
-                    keywords.push({
-                        value: keyword,
-                        times: 1,
-                        timestamp: new Date()
-                    });
-                }
-                keywords = $filter('orderBy')(keywords, 'times', true);
-                localStorageService.set(this.keywordKey, angular.toJson(keywords));
-
-            },
-            getSearchHistory: function() {
-                var keywords = angular.fromJson(localStorageService.get(this.keywordKey));
-                return keywords || [];
-            },
-
-            parseCv: function(fileToUpload) {
-                var deferred = $q.defer();
-                $http({
-                        method: 'POST',
-                        url: apiRoot + '/cv/parse',
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        },
-                        data: {
-                            fileToUpload: fileToUpload
-                        },
-                        transformRequest: function(data, headersGetter) {
-                            var formData = new FormData();
-                            angular.forEach(data, function(value, key) {
-                                formData.append(key, value);
-                            });
-
-                            var headers = headersGetter();
-                            delete headers['Content-Type'];
-
-                            return formData;
-                        }
-
-                    })
-                    .success(function(resp) {
-                        deferred.resolve(resp.data);
-                    })
-                    .error(function(error) {
-                        deferred.rejectd(error);
-                    });
-                return deferred.$promise;
-            }
-        };
-        self.smsCampaign = {
-            api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
-                update: {
-                    method: 'PUT'
-                },
-                runCampaign: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/runcampaign'
-                },
-                stopCampaign: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/stopcampaign'
-                },
-                deleteCampaign: {
-                    method: 'GET',
-                    url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
-                },
-            }),
-            get: function(userId, companyId, smscampaignid) {
-                return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
-            },
-            save: function(userId, companyId, smscampaign) {
-                if (smscampaign.hasOwnProperty('id')) {
-                    return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
-                } else {
-                    return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
-                }
-            },
-            getCampaign: function(userId, companyId, limit, page) {
-                limit = limit || 10;
-                page = page || 1;
-                var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign';
-                $http.get(url, {
-                        params: {
-                            limit: limit,
-                            page: page
-                        }
-                    })
-                    .then(function(resp) {
-                        deferred.resolve(resp.data);
-                    }, function(error) {
-                        deferred.reject(error.data);
-                    })
-                return deferred.promise;
-            },
-            uploadCsv: function(userId, companyId, smscampaignid, file) {
-                var data = {};
-                data.csv = file;
-                return Upload.upload({
-                    url: apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/uploadfile',
-                    data: data
-                });
-            },
-            getSearchCampaign: function(userId, companyId, search, limit, page) {
-                limit = limit || 10;
-                page = page || 1;
-                var deferred = $q.defer();
-                var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/search';
-                $http.get(url, {
-                        params: {
-                            search: search,
-                            limit: limit,
-                            page: page
-                        }
-                    })
-                    .then(function(resp) {
-                        deferred.resolve(resp.data);
-                    }, function(error) {
-                        deferred.reject(error.data);
-                    })
-                return deferred.promise;
-            },
-            runCampaign: function(userId, companyId, smscampaignid) {
-                return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
-            },
-            stopCampaign: function(userId, companyId, smscampaignid) {
-                return this.api.stopCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
-            },
-            deleteCampaign: function(userId, companyId, smscampaignid) {
-                return this.api.deleteCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
-            },
-            recipient: {
-                api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+            };
+            self.shortlist = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId', { shortlistId: '@id' }, {
                     update: {
                         method: 'PUT'
                     },
-                    processRecipient: {
+                    getChildren: {
                         method: 'GET',
-                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/process'
+                        url: apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId/child'
                     },
-                    unProcessRecipient: {
+                    query: {
                         method: 'GET',
-                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unprocess'
+                        isArray: false
                     },
-                    sendRecipient: {
+                    getUserFolder: {
                         method: 'GET',
-                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/send'
+                        url: apiRoot + '/employer/:userId/company/:companyId/shortlist/:shortlistId/userFolder'
+
                     },
-                    unSendRecipient: {
+                    getByJobseekerId: {
                         method: 'GET',
-                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unsend'
+                        url: apiRoot + '/employer/:userId/company/:companyId/shortlistByJobseekerId/:jobseekerId'
+                    }
+                }),
+                get: function(userId, companyId, shortlistId) {
+                    return this.api.get({
+                        userId: userId,
+                        companyId: companyId,
+                        shortlistId: shortlistId
+                    }).$promise;
+                },
+                query: function(userId, companyId) {
+                    return this.api.query({
+                        userId: userId,
+                        companyId: companyId
+                    }).$promise;
+                },
+                save: function(userId, companyId, shortlistNode) {
+                    if (shortlistNode.hasOwnProperty('id')) {
+                        return this.api.update({
+                            userId: userId,
+                            companyId: companyId
+                        }, shortlistNode).$promise;
+                    } else {
+                        return this.api.save({
+                            userId: userId,
+                            companyId: companyId
+                        }, shortlistNode).$promise;
+                    }
+                },
+                remove: function(userId, companyId, shortlistId) {
+                    return this.api.remove({
+                        userId: userId,
+                        companyId: companyId,
+                        shortlistId: shortlistId
+                    }).$promise;
+                },
+                getChildren: function(userId, companyId, shortlistId) {
+                    return this.api.getChildren({
+                        userId: userId,
+                        companyId: companyId,
+                        shortlistId: shortlistId
+                    }).$promise;
+                },
+                getUserFolder: function(userId, companyId, shortlistId) {
+                    return this.api.getUserFolder({
+                        userId: userId,
+                        companyId: companyId,
+                        shortlistId: shortlistId
+                    }).$promise;
+                },
+                getByJobseekerId: function(userId, companyId, jobseekerId) {
+                    return this.api.getByJobseekerId({
+                        userId: userId,
+                        companyId: companyId,
+                        jobseekerId: jobseekerId
+                    }).$promise;
+                }
+            };
+            self.employee = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/employee/:employeeId', { employeeId: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    },
+                    query: {
+                        method: 'GET',
+                        isArray: false,
+                        url: apiRoot + '/employer/:userId/company/:companyId/employee'
+                    },
+                    sendInvite: {
+                        method: 'POST',
+                        url: apiRoot + '/employer/:userId/company/:companyId/employee/invite'
                     }
 
                 }),
-                update: function(userId, companyId, smscampaignid, recipient) {
-                    return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
+                get: function(userId, companyId, employeeId) {
+                    return this.api.get({ userId: userId, companyId: companyId, employeeId: employeeId }).$promise;
                 },
-                getRecipient: function(userId, companyId, smscampaignid, limit, page) {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
-                            limit: limit,
-                            page: page
-                        })
-                        .then(function(resp) {
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                    return deferred.promise;
+                query: function(userId, companyId, limit, page, qname) {
+                    limit = limit || 0;
+                    page = page || 0;
+                    return this.api.query({
+                        userId: userId,
+                        companyId: companyId,
+                        page: page,
+                        limit: limit,
+                        qname: qname
+                    }).$promise;
                 },
-                getRecipientById: function(userId, companyId, smscampaignid, recipientId) {
-                    var deferred = $q.defer();
-                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
-                            limit: limit,
-                            page: page
-                        })
-                        .then(function(resp) {
-                            deferred.resolve(resp.data);
-                        }, function(error) {
-                            deferred.reject(error.data);
-                        });
-                    return deferred.promise;
+                save: function(userId, companyId, employee) {
+                    if (employee.hasOwnProperty('id')) {
+                        return this.api.update({ userId: userId, companyId: companyId }, employee).$promise;
+                    } else {
+                        return this.api.save({ userId: userId, companId: companyId }, employee).$promise;
+                    }
                 },
-                processRecipient: function(userId, companyId, smscampaignid, recipientId) {
-                    return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                remove: function(userId, companyId, employeeId) {
+                    return this.api.remove({
+                        userId: userId,
+                        companyId: companyId,
+                        employeeId: employeeId
+                    }).$promise;
                 },
-                unProcessRecipient: function(userId, companyId, smscampaignid, recipientId) {
-                    return this.api.unProcessRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
-                },
-                sendRecipient: function(userId, companyId, smscampaignid, recipientId) {
-                    return this.api.sendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
-                },
-                unSendRecipient: function(userId, companyId, smscampaignid, recipientId) {
-                    return this.api.unSendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                sendInvite: function(userId, companyId, employeeId) {
+                    return this.api.sendInvite({ userId: userId, companyId: companyId }, { employee_id: employeeId }).$promise;
                 }
-            }
-        };
-    }])
+            };
+            self.emailCv = {
+                api: $resource(apiRoot + "/employer/:userId/emailCv", null, {
+                    sendCv: {
+                        method: "POST"
+                    }
+                }),
+
+                sendCv: function(userId, requestData) {
+                    return this.api.sendCv({ userId: userId }, requestData).$promise;
+                }
+            };
+            self.jobGroup = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/jobgroup/:jobgroupId', { jobgroupId: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    }
+                }),
+                get: function(userId, companyId, jobgroupId) {
+                    return this.api.get({ userId: userId, companyId: companyId, jobgroupId: jobgroupId }).$promise;
+                },
+                save: function(userId, companyId, jobgroup) {
+                    if (jobgroup.hasOwnProperty('id')) {
+                        return this.api.update({ userId: userId, companyId: companyId }, jobgroup).$promise;
+                    } else {
+                        return this.api.save({ userId: userId, companyId: companyId }, jobgroup).$promise;
+                    }
+                },
+                remove: function(userId, companyId, jobgroupId) {
+                    return this.api.remove({ userId: userId, companyId: companyId, jobgroupId: jobgroupId }).$promise;
+                }
+            };
+            self.cv = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/cv/:cvId', { cvId: '@id' }, {
+                    saveToCompany: {
+                        method: "POST",
+                        url: apiRoot + '/employer/:userId/company/:companyId/cv/link'
+                    }
+                }),
+                filterKey: 'searchFilters',
+                saveToCompany: function(userId, companyId, cvId) {
+                    return this.api.saveToCompany({ userId: userId, companyId: companyId }, { uploadId: cvId }).$promise;
+                },
+                getSearchStats: function(userId, companyId, searchCriterias) {
+                    var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/stats';
+                    var deferred = $q.defer();
+                    $http.post(url, searchCriterias)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+                    return deferred.promise;
+                },
+                search: function(userId, companyId, searchCriterias, limit, page) {
+                    var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search';
+                    var deferred = $q.defer();
+                    $http.post(url, searchCriterias, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+                    return deferred.promise;
+                },
+                getSearchKeywordSuggestions: function(userId, companyId, $keyword) {
+                    if (!userId || !companyId)
+                        throw "missing userId and companyId";
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/cv/search/suggestions?q=' + $keyword)
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                },
+                storeSearchFilter: function(userId, companyId, filter) {
+                    var storageName = this.filterKey + userId;
+                    var filters = angular.fromJson(localStorageService.get(storageName)) || [];
+                    var filterHash = md5.createHash(angular.toJson(filter));
+                    var existingEntry = $filter('filter')(filters, { hash: filterHash })[0];
+                    if (existingEntry) {
+                        existingEntry.times++;
+                        existingEntry.timestamp = new Date();
+                    } else {
+                        filters.push({
+                            hash: filterHash,
+                            filter: filter,
+                            times: 1,
+                            companyId: companyId,
+                            timestamp: new Date()
+                        });
+                    }
+                    filters = $filter('orderBy')(filters, 'times', true);
+                    localStorageService.set(storageName, angular.toJson(filters));
+
+                },
+                getSearchHistory: function(userId) {
+                    var keywords = angular.fromJson(localStorageService.get(this.filterKey + userId));
+                    return keywords || [];
+                },
+
+                parseCv: function(fileToUpload) {
+                    var deferred = $q.defer();
+                    $http({
+                            method: 'POST',
+                            url: apiRoot + '/cv/parse',
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            },
+                            data: {
+                                fileToUpload: fileToUpload
+                            },
+                            transformRequest: function(data, headersGetter) {
+                                var formData = new FormData();
+                                angular.forEach(data, function(value, key) {
+                                    formData.append(key, value);
+                                });
+
+                                var headers = headersGetter();
+                                delete headers['Content-Type'];
+
+                                return formData;
+                            }
+
+                        })
+                        .success(function(resp) {
+                            deferred.resolve(resp.data);
+                        })
+                        .error(function(error) {
+                            deferred.rejectd(error);
+                        });
+                    return deferred.$promise;
+                }
+            };
+            self.smsCampaign = {
+                api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid', { smscampaignid: '@id' }, {
+                    update: {
+                        method: 'PUT'
+                    },
+                    runCampaign: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/runcampaign'
+                    },
+                    stopCampaign: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/stopcampaign'
+                    },
+                    deleteCampaign: {
+                        method: 'GET',
+                        url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/deletecampaign'
+                    },
+                }),
+                get: function(userId, companyId, smscampaignid) {
+                    return this.api.get({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+                },
+                save: function(userId, companyId, smscampaign) {
+                    if (smscampaign.hasOwnProperty('id')) {
+                        return this.api.update({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                    } else {
+                        return this.api.save({ userId: userId, companyId: companyId }, smscampaign).$promise;
+                    }
+                },
+                getCampaign: function(userId, companyId, limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign';
+                    $http.get(url, {
+                            params: {
+                                limit: limit,
+                                page: page
+                            }
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
+                },
+                uploadCsv: function(userId, companyId, smscampaignid, file) {
+                    var data = {};
+                    data.csv = file;
+                    return Upload.upload({
+                        url: apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/uploadfile',
+                        data: data
+                    });
+                },
+                getSearchCampaign: function(userId, companyId, search, limit, page) {
+                    limit = limit || 10;
+                    page = page || 1;
+                    var deferred = $q.defer();
+                    var url = apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/search';
+                    $http.get(url, {
+                            params: {
+                                search: search,
+                                limit: limit,
+                                page: page
+                            }
+                        })
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        })
+                    return deferred.promise;
+                },
+                runCampaign: function(userId, companyId, smscampaignid) {
+                    return this.api.runCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+                },
+                stopCampaign: function(userId, companyId, smscampaignid) {
+                    return this.api.stopCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+                },
+                deleteCampaign: function(userId, companyId, smscampaignid) {
+                    return this.api.deleteCampaign({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }).$promise;
+                },
+                recipient: {
+                    api: $resource(apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:smsrecipientid', { smsrecipientid: '@id' }, {
+                        update: {
+                            method: 'PUT'
+                        },
+                        processRecipient: {
+                            method: 'GET',
+                            url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/process'
+                        },
+                        unProcessRecipient: {
+                            method: 'GET',
+                            url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unprocess'
+                        },
+                        sendRecipient: {
+                            method: 'GET',
+                            url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/send'
+                        },
+                        unSendRecipient: {
+                            method: 'GET',
+                            url: apiRoot + '/employer/:userId/company/:companyId/smscampaign/:smscampaignid/recipient/:recipientId/unsend'
+                        }
+
+                    }),
+                    update: function(userId, companyId, smscampaignid, recipient) {
+                        return this.api.update({ userId: userId, companyId: companyId, smscampaignid: smscampaignid }, recipient).$promise;
+                    },
+                    getRecipient: function(userId, companyId, smscampaignid, limit, page) {
+                        var deferred = $q.defer();
+                        $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient', {
+                                limit: limit,
+                                page: page
+                            })
+                            .then(function(resp) {
+                                deferred.resolve(resp.data);
+                            }, function(error) {
+                                deferred.reject(error.data);
+                            });
+                        return deferred.promise;
+                    },
+                    getRecipientById: function(userId, companyId, smscampaignid, recipientId) {
+                        var deferred = $q.defer();
+                        $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/smscampaign/' + smscampaignid + '/recipient/' + recipientId, {
+                                limit: limit,
+                                page: page
+                            })
+                            .then(function(resp) {
+                                deferred.resolve(resp.data);
+                            }, function(error) {
+                                deferred.reject(error.data);
+                            });
+                        return deferred.promise;
+                    },
+                    processRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                        return this.api.processRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                    },
+                    unProcessRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                        return this.api.unProcessRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                    },
+                    sendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                        return this.api.sendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                    },
+                    unSendRecipient: function(userId, companyId, smscampaignid, recipientId) {
+                        return this.api.unSendRecipient({ userId: userId, companyId: companyId, smscampaignid: smscampaignid, recipientId: recipientId }).$promise;
+                    }
+                }
+            };
+        }
+    ])
     .service('smsService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
         var self = this;
         var apiRoot = ngZconnected.apiUrl;
