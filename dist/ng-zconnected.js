@@ -2201,7 +2201,7 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                 return deferred.promise;
             },
             password : {
-                api: $resource(apiRoot + '/user/:userId/password', {
+                api: $resource(apiRoot + '/user/:userId/password', {}, {
                     update: {
                         method: 'PUT'
                     }
