@@ -1857,6 +1857,18 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                     }
                 }
             };
+            self.insights = {
+                getTotalPosts: function(userId, companyId) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/insights/posts')
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
+                }
+            };
         }
     ])
     .service('smsService', ['$resource', 'ngZconnected', function($resource, ngZconnected) {
