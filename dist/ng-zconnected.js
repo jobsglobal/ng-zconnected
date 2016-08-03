@@ -1877,6 +1877,16 @@ angular.module('ngZconnected.api', ['ngResource', 'ngCookies', 'ngFileUpload', '
                             deferred.reject(error.data);
                         });
                     return deferred.promise;
+                },
+                getTotalShares: function(userId, companyId) {
+                    var deferred = $q.defer();
+                    $http.get(apiRoot + '/employer/' + userId + '/company/' + companyId + '/insights/shares')
+                        .then(function(resp) {
+                            deferred.resolve(resp.data);
+                        }, function(error) {
+                            deferred.reject(error.data);
+                        });
+                    return deferred.promise;
                 }
             };
         }
